@@ -1,0 +1,152 @@
+<div id="rightSidebar" class="ml-5 max-w-xs min-w-[20rem]">
+    {% if activated_route.isAuthor() %}
+        <div class="bg-white dark:bg-slate-800 rounded-md">
+            <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if entity.avatar %}
+                            <img class="h-12 w-12 rounded-full" src="{{ asset(entity.avatar) }}" alt="{{ entity.nickname }}">
+                        {% endif %}
+                    </div>
+                    <div {% if entity.avatar %} class="ml-2" {% endif %}>
+                        {% set dynastyId = dynasty(entity) %}
+                        <h3 class="text-lg font-medium leading-8 text-slate-700 dark:text-slate-300">
+                            {{ entity.getNickname() }}
+                            {% if dynastyId %}
+                                {% set dynasty = taxonomy(dynastyId) %}
+                                {% if dynasty %}
+                                    <span class="text-sm text-slate-400">[{{ dynasty.name }}]</span>
+                                {% endif %}
+                            {% endif %}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="indent-8 p-4">
+                {% set description = entity.getMeta('description') %}
+                {% if description %}
+                    <p class="text-slate-700 dark:text-slate-400">{{ description.getMetaValue() }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% set authors = widget('high_author') %}
+        {% if authors %}
+        <div class="bg-white  dark:bg-slate-800 rounded-md mt-8">
+            <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+                <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">最受欢迎作者</h3>
+            </div>
+            <div class="p-4">
+                {% for item in authors %}
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            {% if item.avatar %}
+                                <img class="h-12 w-12 rounded-full" src="{{ asset(item.avatar) }}" alt="{{ item.nickname }}">
+                            {% endif %}
+                        </div>
+                        <div {% if item.avatar %} class="ml-2" {% endif %}>
+                            {% set dynastyId = dynasty(item) %}
+                            <h3 class="text-lg font-medium leading-8 text-slate-900 dark:text-slate-400">
+                                <a class="hover:underline" href="{{ permalink(item) }}">{{ item.getNickname() }}</a>
+                                {% if dynastyId %}
+                                    {% set dynasty = taxonomy(dynastyId) %}
+                                    {% if dynasty %}
+                                        <span class="text-sm text-slate-400">[{{ dynasty.name }}]</span>
+                                    {% endif %}
+                                {% endif %}
+                            </h3>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% set authorEntities = widget('high_author_posts', {author: entity.id}) %}
+        {% if authorEntities %}
+            <div class="bg-white  dark:bg-slate-800 rounded-md mt-8">
+                <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+                    <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">{{ entity.nickname }}最受欢迎作品</h3>
+                </div>
+                <ul>
+                {% for item in authorEntities %}
+                    <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
+                        <span class="block rounded-full  w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">{% if loop.index < 4 %}{{ loop.index }}{% endif %}</span>
+                        <h3 class="truncate text-base leading-8 text-slate-900 dark:text-slate-400 ml-2">
+                            <a class="hover:underline" href="{{ permalink(item) }}">{{ item.getTitle() }}</a>
+                        </h3>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+    {% else %}
+
+        {% set entityName = entity.getName() %}
+        {% if activated_route.isSingle() %}
+            {% set entity = entity.getTags()[0] %}
+            {% set entityName = entity.getName() %}
+        {% endif %}
+        <div class="bg-white dark:bg-slate-800 rounded-md">
+            <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+                <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">
+                    最受欢迎的{% if entityName != '诗文' %}{{ entityName }}{% endif %}诗文
+                </h3>
+            </div>
+            <div>
+                <ul>
+                    {% set taxonomyEntities = widget('high_taxonomy_posts', {taxonomy: entity}) %}
+                    {% for item in taxonomyEntities %}
+                        <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
+                            <span class="block rounded-full  w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">{% if loop.index < 4 %}{{ loop.index }}{% endif %}</span>
+                            <h3 class="truncate text-base leading-8 text-slate-900 dark:text-slate-400 ml-2">
+                                <a class="hover:underline" href="{{ permalink(item) }}">{{ item.getTitle() }}</a>
+                            </h3>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-md mt-8">
+            <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+                <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">最受欢迎的作品</h3>
+            </div>
+            <div>
+                <ul>
+                    {% set entities = widget('high_posts') %}
+                    {% for item in entities %}
+                        <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
+                            <span class="block rounded-full w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">{% if loop.index < 4 %}{{ loop.index }}{% endif %}</span>
+                            <h3 class="truncate text-base leading-8 text-slate-900 dark:text-slate-400 ml-2">
+                                <a class="hover:underline" href="{{ permalink(item) }}">{{ item.getTitle() }}</a>
+                            </h3>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="bg-white dark:bg-slate-800 rounded-md mt-8">
+        <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+            <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">热门问答</h3>
+        </div>
+        <div>
+            <ul>
+                {% set entities = widget('high_posts', {subType: 'question'}) %}
+                {% for item in entities %}
+                    <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
+                        <span class="block rounded-full w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">
+                            {% if loop.index < 4 %}{{ loop.index }}{% endif %}
+                        </span>
+                        <h3 class="truncate text-base leading-8 text-slate-900 dark:text-slate-400 ml-2">
+                            <a class="hover:underline" href="{{ permalink(item) }}">{{ item.getTitle() }}</a>
+                        </h3>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>

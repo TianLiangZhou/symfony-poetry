@@ -1,0 +1,38 @@
+{% extends layout %}
+
+{% block body %}
+    <section>
+        <div class="max-w-5xl mx-auto">
+            <div class="isolate px-6 pt-14 lg:px-8">
+                {{ widget('breadcrumb', {template: 'kutty/breadcrumb.html.twig'}) }}
+            </div>
+            <div class="flex isolate mx-auto px-6 pt-4 lg:px-8 justify-between">
+                <div class="flex-auto overflow-hidden">
+                    {% set tags = entity.getTags() %}
+                    {% set tid = [] %}
+                    {% set tagLabels = '' %}
+                    {% for tag in tags %}
+                        {% set tid = tid|merge([tag.getId()]) %}
+                        {% set tagLabels = tagLabels ~ '<a class="rounded-lg px-2 py-1 mx-1 block border border-slate-200 bg-slate-100 dark:border-slate-900 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm" href="'~ permalink(tag)~'">'~tag.getName()~'</a>' %}
+                    {% endfor %}
+                    {% set collection = get_taxonomy_posts(tid, {type: 'post'}) %}
+                    <div class="bg-white dark:bg-slate-800 rounded-md mb-4">
+                        <div  class="py-6 px-4 text-slate-900 dark:text-slate-200 text-center">
+                            <h1 class="text-lg font-bold">{{ entity.getTitle() }}</h1>
+                            <div class="mt-4 text-slate-300">
+                                <p class="py-2">为你找到了<span class="font-bold">{{ widget('pagination').get().total }}</span>篇{{ entity.getTitle()|replace({'有那些': '', '?':'', '？':''}) }}。</p>
+                                <p class="py-2">更新于：{{ entity.getModifiedAt().format('Y-m-d H:i') }}</p>
+                                <p class="py-2 flex items-center justify-center">
+                                    <span>标签：</span>
+                                    {{ tagLabels|raw }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% include 'kutty/list.html.twig' %}
+                </div>
+                {% include 'kutty/right_bar.html.twig' %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends layout %}
+
+{% block body %}
+<section>
+    <div class="max-w-5xl mx-auto">
+        <div class="isolate px-6 pt-14 lg:px-8">
+            {{ widget('breadcrumb', {template: 'kutty/breadcrumb.html.twig'}) }}
+        </div>
+        <div class="flex isolate mx-auto px-6 pt-4 lg:px-8 justify-between">
+            <div class="flex-auto overflow-hidden">
+                {% include 'kutty/list.html.twig' %}
+            </div>
+            {% include 'kutty/right_bar.html.twig' %}
+        </div>
+    </div>
+</section>
+{% endblock %}

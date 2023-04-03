@@ -1,0 +1,18 @@
+<footer class="mt-16 p-6 bg-white dark:bg-slate-800">
+    <div class="mx-auto max-w-screen-xl text-center">
+        {% set navigation = navigation('footer').getIterator() %}
+        {% if navigation.count() > 0 %}
+        <ul class="flex flex-wrap justify-center items-center mb-6 text-gray-900 dark:text-white">
+            {% for item in navigation %}
+            <li>
+                <a href="{{ permalink(item) }}" class="mr-4 hover:underline md:mr-6 ">{{ item.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+            © {{ now|date('Y')}} Powered By <a target="_blank" href="https://octopuspress.dev" class="hover:underline">OctopusPress™</a>. All Rights Reserved.
+        </span>
+    </div>
+</footer>
+
