@@ -1,6 +1,6 @@
 <?php
 
-namespace OctopusPress\Plugin\StatisticalPosts\Widget;
+namespace OctopusPress\Plugin\StatisticalAnalysis\Widget;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -43,7 +43,7 @@ class HighAuthorPosts extends AbstractWidget implements \IteratorAggregate
             ];
         }
         $result = $connection->executeQuery(
-            'SELECT object_id FROM statistical_posts WHERE type = ? AND sub_type = ? AND object_id IN (?) ORDER BY count DESC LIMIT ?',
+            'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? AND object_id IN (?) ORDER BY count DESC LIMIT ?',
             ['post', $attributes['type'] ?? 'post', $result, (int) ($attributes['limit'] ?? 10)],
             [ParameterType::STRING, ParameterType::STRING, ArrayParameterType::INTEGER, ParameterType::INTEGER]
         )->fetchFirstColumn();

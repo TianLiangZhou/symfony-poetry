@@ -1,6 +1,6 @@
 <?php
 
-namespace OctopusPress\Plugin\StatisticalPosts\Widget;
+namespace OctopusPress\Plugin\StatisticalAnalysis\Widget;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
@@ -35,7 +35,7 @@ class HighTaxonomyPosts extends AbstractWidget implements \IteratorAggregate
         if ($taxonomy->getTaxonomy() === TermTaxonomy::CATEGORY) {
             $top500 = $connection
                 ->executeQuery(
-                    'SELECT object_id FROM statistical_posts WHERE type = ? AND sub_type = ? ORDER BY count DESC LIMIT ?',
+                    'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? ORDER BY count DESC LIMIT ?',
                     ['post', $attributes['subType'] ?? 'post', 500],
                     [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
                 )->fetchFirstColumn();
@@ -58,7 +58,7 @@ class HighTaxonomyPosts extends AbstractWidget implements \IteratorAggregate
             }
             $topObjects = $connection
                 ->executeQuery(
-                    'SELECT object_id FROM statistical_posts WHERE type = ? AND sub_type = ? AND object_id IN (?) ORDER BY count DESC LIMIT ?',
+                    'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? AND object_id IN (?) ORDER BY count DESC LIMIT ?',
                     ['post', $attributes['subType'] ?? 'post', $allObjects, (int) ($attributes['limit'] ?? 10)],
                     [ParameterType::STRING, ParameterType::STRING, ArrayParameterType::INTEGER, ParameterType::INTEGER]
                 )->fetchFirstColumn();

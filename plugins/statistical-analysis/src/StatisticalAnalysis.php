@@ -1,5 +1,5 @@
 <?php
-namespace OctopusPress\Plugin\StatisticalPosts;
+namespace OctopusPress\Plugin\StatisticalAnalysis;
 
 
 use Doctrine\DBAL\Exception;
@@ -11,14 +11,14 @@ use OctopusPress\Bundle\Entity\Post;
 use OctopusPress\Bundle\Plugin\Manifest;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
-use OctopusPress\Plugin\StatisticalPosts\EventListener\StatisticalListener;
-use OctopusPress\Plugin\StatisticalPosts\Provider\StatisticalProvider;
-use OctopusPress\Plugin\StatisticalPosts\Widget\HighAuthor;
-use OctopusPress\Plugin\StatisticalPosts\Widget\HighAuthorPosts;
-use OctopusPress\Plugin\StatisticalPosts\Widget\HighPosts;
-use OctopusPress\Plugin\StatisticalPosts\Widget\HighTaxonomyPosts;
+use OctopusPress\Plugin\StatisticalAnalysis\EventListener\StatisticalListener;
+use OctopusPress\Plugin\StatisticalAnalysis\Provider\StatisticalProvider;
+use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighAuthor;
+use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighAuthorPosts;
+use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighPosts;
+use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighTaxonomyPosts;
 
-class StatisticalPosts implements PluginInterface
+class StatisticalAnalysis implements PluginInterface
 {
 
     public static function manifest(): Manifest
@@ -30,7 +30,7 @@ class StatisticalPosts implements PluginInterface
             ->setVersion('1.0.0')
             ->setMinVersion('1.0.0')
             ->setMinPhpVersion('8.1')
-            ->setDescription('稿子统计能帮你统计帖子的浏览量，作者的帖子数量。')
+            ->setDescription('插件用于帖子的浏览统计，类目的浏览统计，作品统计，作者浏览统计。第三方百度，谷歌统计分析。')
             ;
     }
 
@@ -65,16 +65,30 @@ class StatisticalPosts implements PluginInterface
         }
         $date = date('Y-m-d H:i:s');
         $results = $connection->executeQuery(
-            'SELECT count(1) as cnt, author FROM posts WHERE status = ? OR status = ? OR (status = ? AND created_at < ?) GROUP BY author',
-            [Post::STATUS_PUBLISHED, Post::STATUS_PRIVATE, Post::STATUS_FUTURE, $date],
-            [ParameterType::STRING, ParameterType::STRING, ParameterType::STRING, ParameterType::STRING]
+            'SELECT count(1) as cnt, author FROM posts WHERE status = ? OR status = ? GROUP BY author',
+            [Post::STATUS_PUBLISHED, Post::STATUS_PRIVATE],
+            [ParameterType::STRING, ParameterType::STRING]
         )->fetchAllAssociative();
         foreach ($results as $item) {
-            $connection->executeStatement(
-                'INSERT INTO statistical_posts (type, sub_type, object_id, count, updated_at) VALUE (?, ?, ?, ?, ?)',
-                ['user', 'creation', $item['author'], $item['cnt'], $date],
-                [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::INTEGER, ParameterType::STRING]
-            );
+            $exists = $connection->executeQuery(
+                'SELECT * FROM statistical_analysis WHERE type = ? AND sub_type = ? AND object_id = ? LIMIT 1',
+                ['user', 'creation', $item['author']],
+                [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
+            )->fetchOne();
+            if ($exists) {
+                $connection->executeStatement(
+                    'UPDATE statistical_analysis SET count = ? WHERE type = ? AND sub_type = ? AND object_id = ?',
+                    [$item['cnt'], 'user', 'creation', $item['author']],
+                    [ParameterType::INTEGER, ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
+                );
+            } else {
+                $connection->executeStatement(
+                    'INSERT INTO statistical_analysis (type, sub_type, object_id, count, updated_at) VALUE (?, ?, ?, ?, ?)',
+                    ['user', 'creation', $item['author'], $item['cnt'], $date],
+                    [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::INTEGER, ParameterType::STRING]
+                );
+            }
+
         }
     }
 
@@ -102,7 +116,7 @@ class StatisticalPosts implements PluginInterface
      */
     private function getTables(): array
     {
-        $statisticalPost = new Table('statistical_posts');
+        $statisticalPost = new Table('statistical_analysis');
         $statisticalPost->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $statisticalPost->addColumn('type', 'string', ['length' => 32]);
         $statisticalPost->addColumn('sub_type', 'string', ['length' => 32]);

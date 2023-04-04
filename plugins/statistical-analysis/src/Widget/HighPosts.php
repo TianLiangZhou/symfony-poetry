@@ -1,16 +1,15 @@
 <?php
 
-namespace OctopusPress\Plugin\StatisticalPosts\Widget;
+namespace OctopusPress\Plugin\StatisticalAnalysis\Widget;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use OctopusPress\Bundle\Widget\AbstractWidget;
 use Traversable;
 use Twig\TemplateWrapper;
 
-class HighAuthor extends AbstractWidget implements \IteratorAggregate
+class HighPosts extends AbstractWidget implements \IteratorAggregate
 {
 
     protected function template(): string|TemplateWrapper
@@ -27,21 +26,21 @@ class HighAuthor extends AbstractWidget implements \IteratorAggregate
         $entityManager = $this->getBridger()->getEntityManager();
         $result = $entityManager->getConnection()
             ->executeQuery(
-                'SELECT object_id FROM statistical_posts WHERE type = ? AND sub_type = ? ORDER BY count DESC LIMIT ?',
-                ['user', 'author', (int) ($attributes['limit'] ?? 10)],
+                'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? ORDER BY count DESC LIMIT ?',
+                ['post', $attributes['subType'] ?? 'post', (int) ($attributes['limit'] ?? 10)],
                 [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
             )->fetchFirstColumn();
         if (empty($result)) {
             return [
-                'authors' => [],
+                'entities' => [],
             ];
         }
-        $users = $this->getBridger()->getUserRepository()
-            ->findBy([
+        $posts = $this->getBridger()->getPostRepository()
+            ->createQuery([
                 'id' => $result,
-            ]);
+            ])->getResult();
         return [
-            'authors' => $users,
+            'entities' => $posts,
         ];
     }
 
@@ -50,13 +49,10 @@ class HighAuthor extends AbstractWidget implements \IteratorAggregate
         // TODO: Implement delayRegister() method.
     }
 
-    /**
-     * @return Traversable
-     */
     public function getIterator(): Traversable
     {
         // TODO: Implement getIterator() method.
         $context = $this->getContext();
-        return new \ArrayIterator($context['authors']);
+        return new \ArrayIterator($context['entities'] ?? []);
     }
 }

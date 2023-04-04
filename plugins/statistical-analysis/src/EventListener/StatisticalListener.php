@@ -1,6 +1,6 @@
 <?php
 
-namespace OctopusPress\Plugin\StatisticalPosts\EventListener;
+namespace OctopusPress\Plugin\StatisticalAnalysis\EventListener;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
@@ -53,7 +53,7 @@ class StatisticalListener implements EventSubscriberInterface
         $authorId = $event->getPost()->getAuthor()->getId();
         $connection = $this->bridger->getEntityManager()->getConnection();
         $connection->executeQuery(
-            'UPDATE statistical_posts SET `count` = `count` - 1 WHERE type = ? AND sub_type = ? AND object_id = ? AND count > 0',
+            'UPDATE statistical_analysis SET `count` = `count` - 1 WHERE type = ? AND sub_type = ? AND object_id = ? AND count > 0',
             ['user', 'creation', $authorId],
             [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
         );
@@ -82,20 +82,20 @@ class StatisticalListener implements EventSubscriberInterface
         $authorId = $post->getAuthor()->getId();
         $connection = $this->bridger->getEntityManager()->getConnection();
         $record = $connection->executeQuery(
-            'SELECT id FROM statistical_posts WHERE type = ? AND sub_type = ? AND object_id = ? LIMIT 1',
+            'SELECT id FROM statistical_analysis WHERE type = ? AND sub_type = ? AND object_id = ? LIMIT 1',
             ['user', 'creation', $authorId],
             [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
         )->fetchAssociative();
         $date = date('Y-m-d H:i:s');
         if (empty($record) && $status === Post::STATUS_PUBLISHED) {
             $connection->executeStatement(
-                'INSERT INTO statistical_posts (type, sub_type, object_id, count, updated_at) VALUE (?, ?, ?, ?, ?)',
+                'INSERT INTO statistical_analysis (type, sub_type, object_id, count, updated_at) VALUE (?, ?, ?, ?, ?)',
                 ['user', 'creation', $authorId, 1, $date],
                 [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::INTEGER, ParameterType::STRING]
             );
         } else {
             $connection->executeQuery(
-                'UPDATE statistical_posts SET `count` = `count` + ? WHERE type = ? AND sub_type = ? AND object_id = ? AND count > 0',
+                'UPDATE statistical_analysis SET `count` = `count` + ? WHERE type = ? AND sub_type = ? AND object_id = ? AND count > 0',
                 [$status === Post::STATUS_PUBLISHED ? 1 : -1, 'user', 'creation', $authorId],
                 [ParameterType::INTEGER, ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
             );
@@ -126,7 +126,7 @@ class StatisticalListener implements EventSubscriberInterface
         $connection = $this->bridger->getEntityManager()->getConnection();
         foreach ($authors as $authorId => $count) {
             $connection->executeQuery(
-                'UPDATE statistical_posts SET `count` = `count` + ? WHERE type = ? AND sub_type = ? AND object_id = ? AND count > 0',
+                'UPDATE statistical_analysis SET `count` = `count` + ? WHERE type = ? AND sub_type = ? AND object_id = ? AND count > 0',
                 ['user', 'creation', $authorId, -$count],
                 [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::INTEGER]
             );
@@ -183,14 +183,14 @@ class StatisticalListener implements EventSubscriberInterface
         $entityManager = $this->bridger->getEntityManager();
         $connection = $entityManager->getConnection();
         $record = $connection->executeQuery(
-            'SELECT id, count FROM statistical_posts WHERE type = ? and sub_type = ? AND object_id = ? LIMIT 1',
+            'SELECT id, count FROM statistical_analysis WHERE type = ? and sub_type = ? AND object_id = ? LIMIT 1',
             [$type, $subType, $objectId]
         )->fetchAssociative();
         if ($record) {
-            $connection->executeStatement('UPDATE statistical_posts SET count = `count` + 1, updated_at = ?  WHERE id = ?', [date('Y-m-d H:i:s'), $record['id']]);
+            $connection->executeStatement('UPDATE statistical_analysis SET count = `count` + 1, updated_at = ?  WHERE id = ?', [date('Y-m-d H:i:s'), $record['id']]);
         } else {
             $connection->executeStatement(
-                'INSERT INTO statistical_posts (`type`, `sub_type`, `object_id`, `count`, `updated_at`) VALUE (?, ?, ?, ?, ?)',
+                'INSERT INTO statistical_analysis (`type`, `sub_type`, `object_id`, `count`, `updated_at`) VALUE (?, ?, ?, ?, ?)',
                 [$type, $subType, $objectId, 1, date('Y-m-d H:i:s')]
             );
         }
