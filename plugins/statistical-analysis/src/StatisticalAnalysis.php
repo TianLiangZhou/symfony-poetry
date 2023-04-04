@@ -25,7 +25,7 @@ class StatisticalAnalysis implements PluginInterface
     {
         // TODO: Implement manifest() method.
         return Manifest::builder()
-            ->setName("稿子统计")
+            ->setName("统计分析")
             ->addAuthor('OctopusPress.dev', 'https://octopuspress.dev')
             ->setVersion('1.0.0')
             ->setMinVersion('1.0.0')

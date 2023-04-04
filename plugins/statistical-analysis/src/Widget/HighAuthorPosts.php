@@ -34,7 +34,7 @@ class HighAuthorPosts extends AbstractWidget implements \IteratorAggregate
         $connection = $this->getBridger()->getEntityManager()->getConnection();
         $result = $connection->executeQuery(
                 'SELECT id FROM posts WHERE author = ? AND type = ? AND status = ?',
-                [(int) $attributes['author'], $attributes['type'] ?? 'post', Post::STATUS_DRAFT],
+                [(int) $attributes['author'], $attributes['type'] ?? 'post', Post::STATUS_PUBLISHED],
                 [ParameterType::INTEGER, ParameterType::STRING, ParameterType::STRING]
             )->fetchFirstColumn();
         if (empty($result)) {
