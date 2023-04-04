@@ -6,7 +6,8 @@
                     <div class="truncate">
                         <h3 class="title text-lg font-bold text-slate-900 dark:text-slate-200"><a class="hover:underline" href="{{ permalink(item) }}">{{ item.getTitle() }}</a></h3>
                     </div>
-                    <div class="mt-0.5 flex items-center">
+                    <div class="mt-0.5 flex items-start md:items-center flex-col md:flex-row">
+                        <div>
                         {% set author = item.getAuthor() %}
                         {% set dynastyId = dynasty(author) %}
                         {% if dynastyId %}
@@ -16,11 +17,12 @@
                             {% endif %}
                         {% endif %}
                         <a class="hover:underline text-base text-slate-700 dark:text-slate-300" href="{{ permalink(author) }}">{{ author.getNickname()}}</a>
+                        </div>
                         {% set tags = item.getTags() %}
-                        <div class="tags ml-5 flex flex-wrap text-slate-600 dark:text-slate-400">
+                        <div class="tags md:ml-5 flex flex-wrap text-slate-600 dark:text-slate-400">
                             {% for tag in tags %}
                                 {% if loop.index < 7 %}
-                                <a class="tag rounded-lg px-2 py-1 mx-1 block border border-slate-200 bg-slate-100 dark:border-slate-900 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm" href="{{ permalink(tag) }}">{{ tag.name }}</a>
+                                <a class="tag rounded-lg px-2 py-1 mr-2 md:mx-1 my-1 md:my-0 block border border-slate-200 bg-slate-100 dark:border-slate-900 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm" href="{{ permalink(tag) }}">{{ tag.name }}</a>
                                 {% endif %}
                             {% endfor %}
                         </div>
