@@ -6,7 +6,7 @@
             <div class="isolate px-6 pt-14 lg:px-8">
                 {{ widget('breadcrumb', {template: 'kutty/breadcrumb.html.twig'}) }}
             </div>
-            <div class="flex isolate mx-auto px-6 pt-4 lg:px-8 justify-between">
+            <div class="flex isolate mx-auto px-6 pt-4 lg:px-8 justify-between flex-col items-center md:items-start md:flex-row">
                 <div class="flex-auto overflow-hidden">
                     {% set tags = entity.getTags() %}
                     {% set tid = [] %}

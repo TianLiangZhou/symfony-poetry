@@ -19,7 +19,7 @@
                         {% set tags = item.getTags() %}
                         <div class="tags ml-5 flex flex-wrap text-slate-600 dark:text-slate-400">
                             {% for tag in tags %}
-                                {% if loop.index < 9 %}
+                                {% if loop.index < 7 %}
                                 <a class="tag rounded-lg px-2 py-1 mx-1 block border border-slate-200 bg-slate-100 dark:border-slate-900 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm" href="{{ permalink(tag) }}">{{ tag.name }}</a>
                                 {% endif %}
                             {% endfor %}

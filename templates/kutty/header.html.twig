@@ -1,7 +1,7 @@
 {% set navigation = navigation('primary') %}
 <header class="bg-white dark:bg-slate-800 z-[1024] relative shadow-lg sticky top-0">
     <nav id="navigation" class="mx-auto max-w-7xl px-6" aria-label="Top">
-        <div class="flex w-full items-center justify-between py-4">
+        <div class="flex w-full items-center justify-center py-4 sm:justify-between">
             <a href="{{ site_url }}" rel="nofollow">
                 <span class="sr-only">{{ title }}</span>
                 <svg class="h-10 w-auto" viewBox="0 0 332 90" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -117,7 +117,10 @@
         </div>
         <div class="flex flex-wrap justify-center gap-x-6 py-4 sm:hidden">
             {% for nav in navigation %}
-                <a href="{{ permalink(nav) }}" class="text-base font-medium text-slate-900 hover:text-indigo-500">{{ nav.title }}</a>
+                {% set link = permalink(nav) %}
+                {% set compare = compare_url(link) %}
+                <a href="{{ link }}"
+                   class="text-base font-medium {% if compare %} text-indigo-500 {% else %} text-slate-900 dark:text-slate-200 {% endif %} hover:text-indigo-500">{{ nav.title }}</a>
             {% endfor %}
         </div>
     </nav>
