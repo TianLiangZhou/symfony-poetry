@@ -105,7 +105,7 @@
                                         {% endif %}
                                     {% endif %}
 
-                                    {% if 'statistical_analysis' is plugin_activated %}
+                                    {% if 'statistical-analysis' is plugin_activated %}
                                     {% set count = get_plugin('statistical_analysis').user('creation', user.getId()) %}
                                         {% if count > 0 %}
                                         <span class="dynasty text-sm leading-8">作品: {{ count }}</span>

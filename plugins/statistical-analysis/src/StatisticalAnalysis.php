@@ -11,6 +11,7 @@ use OctopusPress\Bundle\Entity\Post;
 use OctopusPress\Bundle\Plugin\Manifest;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
+use OctopusPress\Plugin\StatisticalAnalysis\Controller\StatisticalController;
 use OctopusPress\Plugin\StatisticalAnalysis\EventListener\StatisticalListener;
 use OctopusPress\Plugin\StatisticalAnalysis\Provider\StatisticalProvider;
 use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighAuthor;
@@ -34,6 +35,9 @@ class StatisticalAnalysis implements PluginInterface
             ;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function launcher(Bridger $bridger): void
     {
         // TODO: Implement launcher() method.
@@ -44,7 +48,10 @@ class StatisticalAnalysis implements PluginInterface
                 ->registerForClassName(HighAuthorPosts::class)
                 ->registerForClassName(HighTaxonomyPosts::class);
         });
-
+        $bridger->getHook()->add('plugin_action_links', function (array $actions, string $name) {
+            return $actions;
+        });
+        $bridger->getPlugin()->registerRoute(StatisticalController::class);
     }
 
     /**
@@ -101,6 +108,7 @@ class StatisticalAnalysis implements PluginInterface
     {
         // TODO: Implement getServices() method.
         return [
+            new StatisticalController($bridger),
             new StatisticalListener($bridger),
         ];
     }

@@ -27,6 +27,27 @@ class StatisticalListener implements EventSubscriberInterface
     public function __construct(Bridger $bridger)
     {
         $this->bridger = $bridger;
+
+        $this->bridger->getHook()->add('footer', [$this, 'footer']);
+    }
+
+    /**
+     * @return void
+     */
+    public function footer(): void
+    {
+        $option = $this->bridger->getOptionRepository();
+        if ($option->value('_baidu_analysis') && ($identity = $option->value('_baidu_analysis_identity'))) {
+            echo <<<EOF
+<script>var _hmt = _hmt || []; (function() { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?{$identity}"; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })();</script>
+EOF;
+        }
+        if ($option->value('_google_analysis') && ($identity = $option->value('_google_analysis_identity'))) {
+            echo <<<EOF
+<script async src="https://www.googletagmanager.com/gtag/js?id={$identity}"></script>
+<script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '{$identity}');</script>
+EOF;
+        }
     }
 
 
