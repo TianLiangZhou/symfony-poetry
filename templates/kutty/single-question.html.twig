@@ -16,11 +16,11 @@
                         {% set tagLabels = tagLabels ~ '<a class="rounded-lg px-2 py-1 mx-1 block border border-slate-200 bg-slate-100 dark:border-slate-900 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm" href="'~ permalink(tag)~'">'~tag.getName()~'</a>' %}
                     {% endfor %}
                     {% set collection = get_taxonomy_posts(tid, {type: 'post'}) %}
-                    <div class="bg-white dark:bg-slate-800 rounded-md mb-4">
+                    <div class="bg-white dark:bg-slate-800 rounded-md">
                         <div  class="py-6 px-4 text-slate-900 dark:text-slate-200 text-center">
                             <h1 class="text-lg font-bold">{{ entity.getTitle() }}</h1>
-                            <div class="mt-4 text-slate-300">
-                                <p class="py-2">为你找到了<span class="font-bold">{{ widget('pagination').get().total }}</span>篇{{ entity.getTitle()|replace({'有那些': '', '?':'', '？':''}) }}。</p>
+                            <div class="mt-4 text-slate-700 dark:text-slate-300">
+                                <p class="py-2">为你找到了<span class="font-bold">{{ widget('pagination').get().total ?? 0 }}</span>篇{{ entity.getTitle()|replace({'有那些': '', '?':'', '？':''}) }}。</p>
                                 <p class="py-2">更新于：{{ entity.getModifiedAt().format('Y-m-d H:i') }}</p>
                                 <p class="py-2 flex items-center justify-center">
                                     <span>标签：</span>
@@ -29,6 +29,28 @@
                             </div>
                         </div>
                     </div>
+                    {% set previousNextWg = widget('previous_next', {entity: entity}) %}
+                    {% if previousNextWg %}
+                        {% set previousNext = previousNextWg.getContext() %}
+                        <div class="flex justify-between mt-2 mb-4 flex-col sm:flex-row">
+                            {% if previousNext['previous'] %}
+                                <span class="text-slate-700 dark:text-slate-300">
+                                    上一篇:
+                                    <a class="hover:underline" href="{{ permalink(previousNext['previous']) }}">
+                                        {{ previousNext['previous'].getTitle() }}
+                                    </a>
+                                </span>
+                            {% endif %}
+                            {% if previousNext['next'] %}
+                                <span class="text-slate-700 dark:text-slate-300">
+                                    下一篇:
+                                    <a class="hover:underline" href="{{ permalink(previousNext['next']) }}">
+                                        {{ previousNext['next'].getTitle() }}
+                                    </a>
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                     {% include 'kutty/list.html.twig' %}
                 </div>
                 {% include 'kutty/right_bar.html.twig' %}
