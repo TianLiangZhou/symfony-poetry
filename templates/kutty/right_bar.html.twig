@@ -1,38 +1,8 @@
 <div id="rightSidebar" class="sm:ml-5 sm:max-w-xs flex flex-col w-full min-w-[20rem] mt-8 md:mt-0">
     {% if activated_route.isAuthor() %}
-        <div class="bg-white dark:bg-slate-800 rounded-md">
-            <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        {% if entity.avatar %}
-                            <img class="h-12 w-12 rounded-full" src="{{ asset(entity.avatar) }}" alt="{{ entity.nickname }}">
-                        {% endif %}
-                    </div>
-                    <div {% if entity.avatar %} class="ml-2" {% endif %}>
-                        {% set dynastyId = dynasty(entity) %}
-                        <h3 class="text-lg font-medium leading-8 text-slate-700 dark:text-slate-300">
-                            {{ entity.getNickname() }}
-                            {% if dynastyId %}
-                                {% set dynasty = taxonomy(dynastyId) %}
-                                {% if dynasty %}
-                                    <span class="text-sm text-slate-400">[{{ dynasty.name }}]</span>
-                                {% endif %}
-                            {% endif %}
-                        </h3>
-                    </div>
-                </div>
-            </div>
-            <div class="indent-8 p-4">
-                {% set description = entity.getMeta('description') %}
-                {% if description %}
-                    <p class="text-slate-700 dark:text-slate-400">{{ description.getMetaValue() }}</p>
-                {% endif %}
-            </div>
-        </div>
-
         {% set authors = widget('high_author') %}
         {% if authors %}
-        <div class="bg-white  dark:bg-slate-800 rounded-md mt-8">
+        <div class="bg-white  dark:bg-slate-800 rounded-md">
             <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
                 <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">最受欢迎作者</h3>
             </div>
