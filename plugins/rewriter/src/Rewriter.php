@@ -3,12 +3,23 @@ namespace OctopusPress\Plugin\Rewriter;
 
 use OctopusPress\Bundle\Bridge\Bridger;
 use OctopusPress\Bundle\Customize\Draw;
+use OctopusPress\Bundle\Entity\Post;
+use OctopusPress\Bundle\Entity\TermTaxonomy;
+use OctopusPress\Bundle\Entity\User;
 use OctopusPress\Bundle\Plugin\Manifest;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
+use OctopusPress\Bundle\Repository\OptionRepository;
 
 class Rewriter implements PluginInterface
 {
+
+    private bool|null $rewriterTaxonomy = null;
+
+    private bool|null $rewriterPosts = null;
+
+    private ?OptionRepository $option = null;
+
 
     public static function manifest(): Manifest
     {
@@ -27,8 +38,36 @@ class Rewriter implements PluginInterface
     {
         // TODO: Implement launcher() method.
         $plugin = $bridger->getPlugin();
+        $hook = $bridger->getHook();
+        $this->option = $bridger->getOptionRepository();
         $plugin->registerSetting('/rewriter/setting-form', [$this, 'setting'], '伪静态', 'rewriter');
+        $hook->add('post_type_link', [$this, 'permalink'], -32);
+        $hook->add('taxonomy_link', [$this, 'permalink'], -32);
+        $hook->add('author_link', [$this, 'permalink'], -32);
     }
+
+    /**
+     * @param string $url
+     * @param mixed $object
+     * @return string
+     */
+    public function permalink(string $url, mixed $object): string
+    {
+        if ($this->rewriterPosts === null && $this->option) {
+            $this->rewriterPosts = (bool) $this->option->value('_rewriter_posts');
+        }
+        if ($this->rewriterTaxonomy === null) {
+            $this->rewriterTaxonomy = (bool) $this->option->value('_rewriter_taxonomy');
+        }
+        if ($object instanceof Post && $this->rewriterPosts) {
+            return $url . '.html';
+        }
+        if (($object instanceof TermTaxonomy || $object instanceof User) && $this->rewriterTaxonomy) {
+            return $url . '.html';
+        }
+        return $url;
+    }
+
 
     public function setting(): Draw
     {
