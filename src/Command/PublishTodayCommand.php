@@ -41,7 +41,7 @@ class PublishTodayCommand extends Command
         $current = time();
         foreach ($associative as $item) {
             echo "id: ". $item['id'], "\n";
-            $date = date('Y-m-d H:i:s',$current - random_int(500, 7200));
+            $date = date('Y-m-d H:i:s',$current - random_int(500, 2700));
             $connection->executeStatement(
                 'UPDATE posts SET status = ?, created_at = ?, modified_at = ? WHERE id = ?',
                 [Post::STATUS_PUBLISHED, $date, $date, $item['id']],
