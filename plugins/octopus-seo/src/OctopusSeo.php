@@ -3,6 +3,7 @@ namespace OctopusPress\Plugin\OctopusSeo;
 
 
 use OctopusPress\Bundle\Bridge\Bridger;
+use OctopusPress\Bundle\Event\FilterEvent;
 use OctopusPress\Bundle\Plugin\Manifest;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
@@ -31,10 +32,10 @@ class OctopusSeo implements PluginInterface
     }
 
     /**
-     * @param Bridger $bridger
+     * @param FilterEvent $event
      * @return void
      */
-    public function head(Bridger $bridger): void
+    public function head(FilterEvent $event): void
     {
         echo '<!-- octopus seo start -->';
         echo '<meta name="keywords" content="" />';

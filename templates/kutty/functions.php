@@ -5,6 +5,7 @@ use OctopusPress\Bundle\Customize\Control;
 use OctopusPress\Bundle\Customize\GroupControl;
 use OctopusPress\Bundle\Customize\ImageControl;
 use OctopusPress\Bundle\Entity\User;
+use OctopusPress\Bundle\Event\FilterEvent;
 use OctopusPress\Bundle\Model\CustomizeManager;
 use Twig\TwigFunction;
 
@@ -53,11 +54,11 @@ return function (Bridger $bridger) {
         ->add('body_class', function (array $classes) {
             return array_merge($classes, ['bg-slate-50', 'dark:bg-slate-900']);
         })
-        ->add('setup_theme', function(string $theme, Bridger $bridger) {
-            $bridger->getWidget()
+        ->add('setup_theme', function(string $theme, FilterEvent $event) {
+            $event->getBridger()->getWidget()
                 ->get('breadcrumb')
                 ->addTemplate('kutty/breadcrumb.html.twig');
-            $bridger->getWidget()
+            $event->getBridger()->getWidget()
                 ->get('pagination')
                 ->addTemplate('kutty/pagination.html.twig')
             ;
