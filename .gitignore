@@ -7,6 +7,7 @@
 /public/bundles/
 /public/themes/
 /public/upload/
+/public/plugins/
 /var/
 /vendor/
 /templates/*/node_modules

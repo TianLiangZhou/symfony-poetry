@@ -115,7 +115,9 @@ class OctopusSeo implements PluginInterface
         $siteSubtitle = $rep->subtitle();
         $siteDescription = $rep->description();
         $lang = $rep->lang();
-        $currentUrl = $bridger->getRequest()->getUri();
+        $currentUrl = $bridger->getRequest()->getUriForPath(
+            $bridger->getRequest()->server->get('ORIGIN_REQUEST_URI')
+        );
         $search = [
             '%name%',
             '%slogan%',
