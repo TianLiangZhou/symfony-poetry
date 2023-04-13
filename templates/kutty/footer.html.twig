@@ -11,7 +11,19 @@
         </ul>
         {% endif %}
         <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-            © {{ now|date('Y')}} Powered By <a target="_blank" href="https://octopuspress.dev" class="hover:underline">OctopusPress™</a>. All Rights Reserved.
+            <p>© {{ now|date('Y')}} Powered By <a target="_blank" href="https://octopuspress.dev" class="hover:underline">OctopusPress™</a>. All Rights Reserved.</p>
+            {% set beian = theme_mod('beian') %}
+            {% set keywords = site_keywords|default('')|split(',') %}
+            {% if keywords or beian %}
+            <p class="pt-2">
+                {% for key in keywords %}
+                <a class="mx-1" href="{{ site_url }}">{{ key }}</a>
+                {% endfor %}
+                {% if beian %}
+                <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="nofollow">{{ beian }}</a>
+                {% endif %}
+            </p>
+            {% endif %}
         </span>
     </div>
 </footer>

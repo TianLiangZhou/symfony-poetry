@@ -14,6 +14,7 @@ function registerThemeCustomize(CustomizeManager $manager): void
     $section = $manager->addDefaultSection('kutty', [
         'label' => 'Kutty'
     ]);
+    $section->addControl(Control::create('beian', '备案号'));
 
     $top = new GroupControl('home_banners', [
         'label' => '头条推荐',
