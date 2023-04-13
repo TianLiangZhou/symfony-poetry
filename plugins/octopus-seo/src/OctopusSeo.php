@@ -180,10 +180,10 @@ class OctopusSeo implements PluginInterface
             ['sm_verify', 'shenma-site-verification'],
         ];
         foreach ($verifies as $params) {
-            if (empty($seo[$params[0]])) {
+            if (empty($this->config[$params[0]])) {
                 continue;
             }
-            echo sprintf('<meta name="%s" content="%s" />', $params[1], $seo[$params[0]]) . PHP_EOL;
+            echo "\t\t",sprintf('<meta name="%s" content="%s" />', $params[1], $this->config[$params[0]]), PHP_EOL;
         }
         echo '<!-- octopus seo end -->', PHP_EOL;
     }
