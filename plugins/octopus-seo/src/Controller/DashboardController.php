@@ -122,7 +122,7 @@ class DashboardController extends AdminController
             'default' => $this->bridger->getOptionRepository()->title(),
         ]);
         $basics->add('site_subtitle', '站点短语', 'input', [
-            'default' => $this->bridger->getOptionRepository()->title(),
+            'default' => $this->bridger->getOptionRepository()->subtitle(),
         ]);
         $basics->add('site_description', '标语', 'input', [
             'default' => $this->bridger->getOptionRepository()->description(),
