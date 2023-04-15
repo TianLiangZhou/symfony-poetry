@@ -199,7 +199,7 @@ class DashboardController extends AdminController
         $postTypes = $this->bridger->getPost()->getTypes();
 
         foreach ($postTypes as $type) {
-            if (!$type->isShowUi()) {
+            if (!$type->isShowUi() || !$type->isShowOnFront()) {
                 continue;
             }
             $group = $this->buildGroup('type_' . $type->getName(), 'type', $values['type_' . $type->getName()] ?? []);
@@ -362,7 +362,7 @@ class DashboardController extends AdminController
         ];
         $postTypes = $this->bridger->getPost()->getTypes();
         foreach ($postTypes as $type) {
-            if (!$type->isShowUi()) {
+            if (!$type->isShowUi() || !$type->isShowOnFront()) {
                 continue;
             }
             $default['type_' . $type->getName()] = [

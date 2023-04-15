@@ -12,10 +12,10 @@
         <div class="relative isolate px-6 pt-4 lg:px-8">
             <div class="relative mx-auto max-w-3xl overflow-hidden">
                 <div class="py-16 bg-white dark:bg-slate-800 rounded-md">
-                    <div class="text-center">
+                    <article class="{% if entity.getType() == 'post' %} text-center {% endif %}">
                         {% if entity %}
-                            <h1 class="text-4xl px-4 font-bold tracking-tight text-slate-900 dark:text-slate-200 sm:text-6xl">{{ entity.title }}</h1>
-                            <p class="mt-6 text-lg leading-8 text-slate-500 dark:text-slate-400">
+                            <h1 class="text-4xl text-center px-4 font-bold tracking-tight text-slate-900 dark:text-slate-200 sm:text-6xl">{{ entity.title }}</h1>
+                            <p class="mt-6 text-lg leading-8 text-center text-slate-500 dark:text-slate-400">
                                 {% set author = entity.getAuthor() %}
                                 {% set dynastyId = dynasty(author) %}
                                 {% if dynastyId %}
@@ -28,12 +28,10 @@
                             </p>
                             {% set content = entity.content|split('{br}') %}
                             {% for word in content %}
-                                <p class="mt-6 px-4 text-lg leading-8 text-slate-700 dark:text-slate-300">
-                                    {{ word }}
-                                </p>
+                                <p class="indent-8 mt-6 px-4 text-lg leading-8 text-slate-700 dark:text-slate-300">{{ word }}</p>
                             {% endfor %}
                         {% endif %}
-                    </div>
+                    </article>
                 </div>
                 {% set tags = entity.getTags() %}
                 {% set tagSets = [] %}
@@ -76,7 +74,7 @@
                         <div class="flex">
                         </div>
                     </div>
-                    <div class="indent-8 px-4 py-5 text-slate-700 dark:text-slate-400">
+                    <div class="indent-8 leading-8 px-4 py-5 text-slate-700 dark:text-slate-400">
                         {% set description = author.getMeta('description') %}
                         {% if description %}
                             {{ description.getMetaValue() }}
@@ -96,7 +94,7 @@
                         {% if translation %}
                             {% set values = translation.getMetaValue() %}
                             {% for line in values|split('{br}') %}
-                                <p>{{ line }}</p>
+                                <p class="indent-8 mt-6 first:mt-0 leading-8">{{ line }}</p>
                             {% endfor %}
                         {% endif %}
                     </div>
@@ -115,7 +113,7 @@
                         {% if comment %}
                             {% set values = comment.getMetaValue() %}
                             {% for line in values|split('{br}') %}
-                                <p>{{ line }}</p>
+                                <p class="mt-6 first:mt-0 leading-8">{{ line }}</p>
                             {% endfor %}
                         {% endif %}
                     </div>
