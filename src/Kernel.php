@@ -40,7 +40,7 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ])
             ->registerType('article', [
                 'label' => '文章',
-                'supports' => ['title', 'parent'],
+                'supports' => ['title', 'parent', 'editor', 'author', 'excerpt'],
                 'taxonomies' => ['category', 'tag',],
                 'parentType' => ['chapter'],
             ])
@@ -54,11 +54,11 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ;
 
         $bridger->getMeta()
-            ->registerPost('post', 'comment', [], Control::create('comment', '注释', [
+            ->registerPost(['post', 'article'], 'comment', [], Control::create('comment', '注释', [
                 'type' => AbstractControl::TEXTAREA,
                 'settings' => ['rows' => 10],
             ]))
-            ->registerPost('post', 'translation', [], Control::create('translation', '译文', [
+            ->registerPost(['post', 'article'], 'translation', [], Control::create('translation', '译文', [
                 'type' => AbstractControl::TEXTAREA,
                 'settings' => ['rows' => 10],
             ]))
