@@ -1,6 +1,6 @@
 {
   "name": "octopus-press-kutty",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "It is a theme for `OctopusPress` content management system",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
