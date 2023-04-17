@@ -53,6 +53,12 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ->addTaxonomyMenu('dynasty', '朝代', ['parent' => 'backend_post', 'sort' => 5])
             ;
 
+
+        $taxonomies = $bridger->getTaxonomyRepository()->taxonomies('dynasty');
+        $options = [];
+        foreach ($taxonomies as $taxonomy) {
+            $options[] = ['label' => $taxonomy->getName(), 'value' => $taxonomy->getId()];
+        }
         $bridger->getMeta()
             ->registerPost(['post', 'article'], 'comment', [], Control::create('comment', '注释', [
                 'type' => AbstractControl::TEXTAREA,
@@ -61,6 +67,10 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ->registerPost(['post', 'article'], 'translation', [], Control::create('translation', '译文', [
                 'type' => AbstractControl::TEXTAREA,
                 'settings' => ['rows' => 10],
+            ]))
+            ->registerUser('dynasty', [], Control::create('dynasty', '朝代', [
+                'type' => 'select',
+                'options' => $options,
             ]))
             ;
     }
