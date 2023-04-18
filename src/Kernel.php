@@ -34,15 +34,14 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ])
             ->registerType('chapter', [
                 'label' => '章节',
-                'showOnFront' => false,
-                'supports' => ['title', 'parent'],
+                'supports' => ['title', 'parent', 'excerpt', 'editor'],
+                'taxonomies' => ['category', 'tag',],
                 'parentType' => ['book', 'chapter'],
             ])
             ->registerType('article', [
                 'label' => '文章',
-                'supports' => ['title', 'parent', 'editor', 'author', 'excerpt'],
+                'supports' => ['title', 'editor', 'author', 'excerpt', 'thumbnail'],
                 'taxonomies' => ['category', 'tag',],
-                'parentType' => ['chapter'],
             ])
         ;
         $plugin = $bridger->getPlugin();
