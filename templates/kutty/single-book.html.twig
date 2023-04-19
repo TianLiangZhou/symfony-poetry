@@ -66,7 +66,7 @@
                             <div class="grid grid-cols-1">
                                 {% set thumbnail = entity.getThumbnail() %}
                                 {% if thumbnail %}
-                                <img src="{{ asset(thumbnail.url) }}" alt="{{ entity.getTitle() }}" width="172" class="lg:col-span-2 lg:row-span-2 rounded-lg">
+                                    {{ thumbnail(thumbnail, 'thumbnail', 'lg:col-span-2 lg:row-span-2 rounded-lg') }}
                                 {% endif %}
                             </div>
                         </div>
