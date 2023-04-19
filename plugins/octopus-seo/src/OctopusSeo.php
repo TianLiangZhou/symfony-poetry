@@ -64,7 +64,7 @@ class OctopusSeo implements PluginInterface
         $createdAt = $modifiedAt = $author = "";
         $tags = $attachment = [];
         $ogType = 'article';
-        $title = $desc = $excerpt = $intro = $category = $level = "";
+        $title = $desc = $excerpt = $intro = $category = $level = $parent = '';
         /**
          * @var $entity ArchiveDataSet|Post
          */
@@ -79,11 +79,17 @@ class OctopusSeo implements PluginInterface
             $title = $entity->getTitle();
             $excerpt = $entity->getExcerpt();
             if (mb_strlen($excerpt) > 155) {
-                $excerpt = mb_substr($excerpt, 0, 154);
+                $excerpt = mb_substr($excerpt, 0, 155);
             }
             $arrayCollection = $entity->getCategories();
             if ($arrayCollection->count() > 0) {
                 $category = $arrayCollection->get(0)->getName();
+            }
+            if ($entity->getParent() != null) {
+                $parent = $entity->getParent()->getTitle();
+                if (empty($excerpt)) {
+                    $excerpt = $entity->getParent()->getExcerpt();
+                }
             }
             $option = $this->config['type_' . $entity->getType()];
         } elseif ($activatedRoute->isArchives()) {
@@ -128,10 +134,11 @@ class OctopusSeo implements PluginInterface
             '%desc%',
             '%level%',
             '%intro%',
+            '%parent%',
             '%separator%'
         ];
         $replace = [
-            $siteTitle, $siteSubtitle, $siteDescription, $title, $category, $excerpt, $desc, $level, $intro, $sep,
+            $siteTitle, $siteSubtitle, $siteDescription, $title, $category, $excerpt, $desc, $level, $intro, $parent, $sep,
         ];
         $title = str_replace($search, $replace, $option['title']);
         $description = str_replace($search, $replace, $option['description']);
