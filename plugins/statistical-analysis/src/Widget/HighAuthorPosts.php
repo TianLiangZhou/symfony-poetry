@@ -31,11 +31,16 @@ class HighAuthorPosts extends AbstractWidget implements \IteratorAggregate
                 'entities' => [],
             ];
         }
+        $types = (array) ($attributes['type'] ?? []);
+        if (empty($types)) {
+            $types = $this->getBridger()->getPost()
+                ->getShowFrontTypes();
+        }
         $connection = $this->getBridger()->getEntityManager()->getConnection();
         $result = $connection->executeQuery(
-                'SELECT id FROM posts WHERE author = ? AND type = ? AND status = ?',
-                [(int) $attributes['author'], $attributes['type'] ?? 'post', Post::STATUS_PUBLISHED],
-                [ParameterType::INTEGER, ParameterType::STRING, ParameterType::STRING]
+                'SELECT id FROM posts WHERE author = ? AND type IN (?) AND status = ?',
+                [(int) $attributes['author'], $types, Post::STATUS_PUBLISHED],
+                [ParameterType::INTEGER, ArrayParameterType::STRING, ParameterType::STRING]
             )->fetchFirstColumn();
         if (empty($result)) {
             return [
@@ -43,19 +48,25 @@ class HighAuthorPosts extends AbstractWidget implements \IteratorAggregate
             ];
         }
         $result = $connection->executeQuery(
-            'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? AND object_id IN (?) ORDER BY count DESC LIMIT ?',
-            ['post', $attributes['type'] ?? 'post', $result, (int) ($attributes['limit'] ?? 10)],
-            [ParameterType::STRING, ParameterType::STRING, ArrayParameterType::INTEGER, ParameterType::INTEGER]
+            'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type IN (?) AND object_id IN (?) ORDER BY count DESC LIMIT ?',
+            ['post', $types, $result, (int) ($attributes['limit'] ?? 10)],
+            [ParameterType::STRING, ArrayParameterType::STRING, ArrayParameterType::INTEGER, ParameterType::INTEGER]
         )->fetchFirstColumn();
         if (empty($result)) {
             return [
                 'entities' => [],
             ];
         }
+        $orderByMap = array_flip($result);
         $posts = $this->getBridger()->getPostRepository()
-            ->createQuery([
+            ->findBy([
                 'id' => $result,
-            ])->getResult();
+            ]);
+        $overOrder = [];
+        foreach ($posts as $item) {
+            $overOrder[$orderByMap[$item->getId()]] = $item;
+        }
+        ksort($overOrder, SORT_NUMERIC);
         return [
             'entities' => $posts,
         ];

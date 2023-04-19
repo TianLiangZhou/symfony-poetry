@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
+use OctopusPress\Bundle\Entity\Post;
 use OctopusPress\Bundle\Entity\TermTaxonomy;
 use OctopusPress\Bundle\Widget\AbstractWidget;
 use Traversable;
@@ -31,49 +32,43 @@ class HighTaxonomyPosts extends AbstractWidget implements \IteratorAggregate
             ];
         }
         $taxonomy = $attributes['taxonomy'];
-        $connection = $this->getBridger()->getEntityManager()->getConnection();
-        if ($taxonomy->getTaxonomy() === TermTaxonomy::CATEGORY) {
-            $top500 = $connection
-                ->executeQuery(
-                    'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? ORDER BY count DESC LIMIT ?',
-                    ['post', $attributes['subType'] ?? 'post', 500],
-                    [ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER]
-                )->fetchFirstColumn();
-            if (empty($top500)) {
-                return ['entities' => []];
-            }
-            $topObjects = $connection->executeQuery(
-                'SELECT object_id FROM term_relationships WHERE object_id IN (?) AND term_taxonomy_id = ? LIMIT ?',
-                [$top500, $taxonomy->getId(), (int) ($attributes['limit'] ?? 10)],
-                [ArrayParameterType::INTEGER, ParameterType::INTEGER, ParameterType::INTEGER]
-            )->fetchFirstColumn();
-        } else {
-            $allObjects = $connection->executeQuery(
-                'SELECT object_id FROM term_relationships WHERE term_taxonomy_id = ?',
-                [$taxonomy->getId()],
-                [ParameterType::INTEGER]
-            )->fetchFirstColumn();
-            if (empty($allObjects)) {
-                return ['entities' => []];
-            }
-            $topObjects = $connection
-                ->executeQuery(
-                    'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type = ? AND object_id IN (?) ORDER BY count DESC LIMIT ?',
-                    ['post', $attributes['subType'] ?? 'post', $allObjects, (int) ($attributes['limit'] ?? 10)],
-                    [ParameterType::STRING, ParameterType::STRING, ArrayParameterType::INTEGER, ParameterType::INTEGER]
-                )->fetchFirstColumn();
+        $types = (array) ($attributes['type'] ?? []);
+        if (empty($types)) {
+            $types = $this->getBridger()->getPost()
+                ->getShowFrontTypes();
         }
-        if (empty($topObjects)) {
+        $connection = $this->getBridger()->getEntityManager()->getConnection();
+        $allObjects = $connection->executeQuery(
+            'SELECT object_id FROM term_relationships WHERE term_taxonomy_id = ? and type IN (?) and status = ? ORDER BY created_at DESC LIMIT 10000',
+            [$taxonomy->getId(), $types, Post::STATUS_PUBLISHED],
+            [ParameterType::INTEGER, ArrayParameterType::STRING, ParameterType::STRING],
+        )->fetchFirstColumn();
+        if (empty($allObjects)) {
+            return ['entities' => []];
+        }
+        $result = $connection
+            ->executeQuery(
+                'SELECT object_id FROM statistical_analysis WHERE type = ? AND sub_type IN (?) AND object_id IN (?) ORDER BY count DESC LIMIT ?',
+                ['post', $types, $allObjects, (int) ($attributes['limit'] ?? 10)],
+                [ParameterType::STRING, ArrayParameterType::STRING, ArrayParameterType::INTEGER, ParameterType::INTEGER]
+            )->fetchFirstColumn();
+        if (empty($result)) {
             return [
                 'entities' => [],
             ];
         }
+        $orderByMap = array_flip($result);
         $posts = $this->getBridger()->getPostRepository()
-            ->createQuery([
-                'id' => $topObjects,
-            ])->getResult();
+            ->findBy([
+                'id' => $result,
+            ]);
+        $overOrder = [];
+        foreach ($posts as $item) {
+            $overOrder[$orderByMap[$item->getId()]] = $item;
+        }
+        ksort($overOrder, SORT_NUMERIC);
         return [
-            'entities' => $posts,
+            'entities' => $overOrder,
         ];
     }
 

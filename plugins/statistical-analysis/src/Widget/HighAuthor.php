@@ -36,12 +36,18 @@ class HighAuthor extends AbstractWidget implements \IteratorAggregate
                 'authors' => [],
             ];
         }
+        $orderByMap = array_flip($result);
         $users = $this->getBridger()->getUserRepository()
             ->findBy([
                 'id' => $result,
             ]);
+        $overOrder = [];
+        foreach ($users as $user) {
+            $overOrder[$orderByMap[$user->getId()]] = $user;
+        }
+        ksort($overOrder, SORT_NUMERIC);
         return [
-            'authors' => $users,
+            'authors' => $overOrder,
         ];
     }
 

@@ -168,34 +168,31 @@ EOF;
     }
 
     /**
+     * @param Request $request
+     * @return void
      * @throws Exception
      */
-    private function statistical(Request $request)
+    private function statistical(Request $request): void
     {
-        $result = $request->attributes->get('_controller_result');
+        $result = $this->bridger->getControllerResult();
         if ($result == null) {
             return ;
         }
-        $type = $subType = '';
-        $objectId = 0;
+        $collection = [];
         if ($result instanceof Post) {
             $type = 'post';
             $subType = $result->getType();
             $objectId = $result->getId();
-        }
-        if ($result instanceof ArchiveDataSet) {
-            $taxonomy = $result->getArchiveTaxonomy();
-            if ($taxonomy instanceof TermTaxonomy) {
-                $type = 'taxonomy';
-                $subType = $taxonomy->getTaxonomy();
-                $objectId = $taxonomy->getId();
-            } elseif ($taxonomy instanceof User) {
-                $type = 'user';
-                $subType = 'author';
-                $objectId = $taxonomy->getId();
+            $collection[] = ['post', $result->getType(), $result->getId()];
+            $collection[] = ['user', 'author', $result->getAuthor()->getId()];
+            if (($parent = $result->getParent()) != null) {
+                $collection[] = ['post', $parent->getType(), $parent->getId()];
             }
         }
-        if (empty($type) || empty($subType) || $objectId < 1) {
+        if ($result instanceof ArchiveDataSet && ($taxonomy = $result->getArchiveTaxonomy()) instanceof TermTaxonomy) {
+            $collection[] = ['taxonomy', $taxonomy->getTaxonomy(), $taxonomy->getId()];
+        }
+        if (count($collection) < 1) {
             return ;
         }
         /**
@@ -203,17 +200,23 @@ EOF;
          */
         $entityManager = $this->bridger->getEntityManager();
         $connection = $entityManager->getConnection();
-        $record = $connection->executeQuery(
-            'SELECT id, count FROM statistical_analysis WHERE type = ? and sub_type = ? AND object_id = ? LIMIT 1',
-            [$type, $subType, $objectId]
-        )->fetchAssociative();
-        if ($record) {
-            $connection->executeStatement('UPDATE statistical_analysis SET count = `count` + 1, updated_at = ?  WHERE id = ?', [date('Y-m-d H:i:s'), $record['id']]);
-        } else {
-            $connection->executeStatement(
-                'INSERT INTO statistical_analysis (`type`, `sub_type`, `object_id`, `count`, `updated_at`) VALUE (?, ?, ?, ?, ?)',
-                [$type, $subType, $objectId, 1, date('Y-m-d H:i:s')]
-            );
+        foreach ($collection as $item) {
+            $record = $connection->executeQuery(
+                'SELECT id, count FROM statistical_analysis WHERE type = ? and sub_type = ? AND object_id = ? LIMIT 1',
+                [$item[0], $item[1], $item[2]]
+            )->fetchAssociative();
+            if ($record) {
+                $connection->executeStatement(
+                    'UPDATE statistical_analysis SET count = `count` + 1, updated_at = ?  WHERE id = ?',
+                    [date('Y-m-d H:i:s'),
+                    $record['id']]
+                );
+            } else {
+                $connection->executeStatement(
+                    'INSERT INTO statistical_analysis (`type`, `sub_type`, `object_id`, `count`, `updated_at`) VALUE (?, ?, ?, ?, ?)',
+                    [$item[0], $item[1], $item[2], 1, date('Y-m-d H:i:s')]
+                );
+            }
         }
     }
 }

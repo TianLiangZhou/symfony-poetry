@@ -106,7 +106,7 @@
         </div>
         <div>
             <ul>
-                {% set entities = widget('high_posts', {subType: 'question'}) %}
+                {% set entities = widget('high_posts', {type: 'question'}) %}
                 {% for item in entities %}
                     <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
                         <span class="block rounded-full w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">
