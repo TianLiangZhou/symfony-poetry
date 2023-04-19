@@ -30,7 +30,7 @@
                         {% if dynastyId %}
                             {% set dynasty = taxonomy(dynastyId) %}
                             {% if dynasty %}
-                                <span class="text-sm leading-8 text-slate-400">[{{ dynasty.name }}]</span>
+                                <span class="text-sm leading-8 text-slate-400">【{{ dynasty.name }}】</span>
                             {% endif %}
                         {% endif %}
                         <a class="hover:underline dark:text-slate-300" href="{{ permalink(author) }}">{{ author.getNickname() }}</a>
@@ -101,7 +101,7 @@
                                     {% if dynastyId %}
                                         {% set dynasty = taxonomy(dynastyId) %}
                                         {% if dynasty %}
-                                            <span class="dynasty text-sm leading-8">[{{ dynasty.name }}]</span>
+                                            <span class="dynasty text-sm leading-8">【{{ dynasty.name }}】</span>
                                         {% endif %}
                                     {% endif %}
 
@@ -161,7 +161,7 @@
                             {% if dynastyId %}
                                 {% set dynasty = taxonomy(dynastyId) %}
                                 {% if dynasty %}
-                                    <span class="dynasty text-sm leading-8 text-slate-400">&nbsp;-&nbsp;[{{ dynasty.name }}]&nbsp;·&nbsp;</span>
+                                    <span class="dynasty text-sm leading-8 text-slate-400">&nbsp;-&nbsp;【{{ dynasty.name }}】&nbsp;·&nbsp;</span>
                                 {% endif %}
                             {% endif %}
                             <a class="text-sm hover:underline text-slate-700 dark:text-slate-300" href="{{ permalink(author) }}">{{ author.getNickname() }}</a>

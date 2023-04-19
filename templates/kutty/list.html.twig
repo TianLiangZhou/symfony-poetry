@@ -13,7 +13,7 @@
                         {% if dynastyId %}
                             {% set dynasty = taxonomy(dynastyId) %}
                             {% if dynasty %}
-                                <span class="text-sm leading-8 text-slate-400">[{{ dynasty.name }}]&nbsp;-&nbsp;</span>
+                                <span class="text-sm leading-8 text-slate-400">【{{ dynasty.name }}】&nbsp;-&nbsp;</span>
                             {% endif %}
                         {% endif %}
                         <a class="hover:underline text-base text-slate-700 dark:text-slate-300" href="{{ permalink(author) }}">{{ author.getNickname()}}</a>
