@@ -7,7 +7,7 @@ return static function (FrameworkConfig $framework) {
     $cache = $framework->cache();
     if (($_ENV['CACHE_DRIVER'] ?? '') === 'redis') {
         $cache->app('cache.adapter.redis')
-            ->defaultRedisProvider(RedisAdapter::class)
+            ->defaultRedisProvider('app.redis.provider')
             ->system('cache.adapter.apcu');
     } else {
         $cache->app('cache.adapter.filesystem')

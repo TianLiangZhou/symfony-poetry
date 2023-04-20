@@ -5,6 +5,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator, ContainerBuilder $container) {
     if ($configurator->env() === 'prod') {
@@ -18,15 +19,17 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
             new Reference('Redis'),
             ['prefix' => 'sess:', 'ttl' => 3600],
         ]);
-
-    $container->register(RedisAdapter::class)
-        ->addArgument(
-            new Reference('Redis'),
-        );
     $services = $configurator->services()
         ->defaults()
         ->autowire()
         ->autoconfigure();
     $services->load("App\\", "../src/*")
          ->exclude('../src/{DependencyInjection,Entity,Tests,Kernel.php}');
+    $container->register('app.redis.provider', \Redis::class)
+        ->setFactory([RedisAdapter::class, 'createConnection'])
+        ->addArgument('redis://%env(REDIS_HOST)%:%env(int:REDIS_PORT)%')
+        ->addArgument([
+            'retry_interval' => 2,
+            'timeout' => 10
+        ]);
 };
