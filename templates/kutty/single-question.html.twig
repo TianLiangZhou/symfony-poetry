@@ -15,7 +15,7 @@
                         {% set tid = tid|merge([tag.getId()]) %}
                         {% set tagLabels = tagLabels ~ '<a class="rounded-lg px-2 py-1 mx-1 block border border-slate-200 bg-slate-100 dark:border-slate-900 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm" href="'~ permalink(tag)~'">'~tag.getName()~'</a>' %}
                     {% endfor %}
-                    {% set collection = get_taxonomy_posts(tid, {type: 'post'}) %}
+                    {% set collection = get_taxonomy_posts(tid, {type: ['post', 'article', 'book']}) %}
                     <div class="bg-white dark:bg-slate-800 rounded-md">
                         <div  class="py-6 px-4 text-slate-900 dark:text-slate-200 text-center">
                             <h1 class="text-lg font-bold">{{ entity.getTitle() }}</h1>

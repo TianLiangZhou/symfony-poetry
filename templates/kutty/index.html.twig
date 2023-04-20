@@ -1,6 +1,7 @@
 {% extends layout %}
 {% block body %}
 <section>
+    {% set keyword = site_keywords|default('')|split(',')[0] %}
     <div class="relative isolate px-6 pt-14 lg:px-8">
         <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
             <svg class="relative left-[calc(50%-11rem)] -z-10 h-[21.1875rem] max-w-none -translate-x-1/2 rotate-[30deg] sm:left-[calc(50%-30rem)] sm:h-[42.375rem]"
@@ -127,6 +128,32 @@
 <section class="mt-8">
     <div class="mx-auto max-w-5xl">
         <div class="flex flex-col">
+
+            <div class="card flex flex-col mb-8 bg-white p-6 rounded-md dark:bg-slate-800">
+                <div class="card-header font-bold mb-6">
+                    <h4 class="pb-2 text-lg text-slate-700 dark:text-slate-300 tracking-widest border-b-2 border-indigo-500">最新的{{ keyword }}</h4>
+                </div>
+                <div class="card-body space-y-8 md:grid md:grid-cols-2 lg:grid-cols-4 sm:gap-6 xl:gap-10 lg:space-y-0">
+                    {% for post in widget('latest_posts', {type: ['post', 'book', 'article'], limit: 48}) %}
+                        <div class="truncate flex items-center">
+                            <h3 class="text-base text-slate-900 font-semibold dark:text-slate-300">
+                                <a class="hover:underline" href="{{ permalink(post) }}">{{ post.title }}</a>
+                            </h3>
+                            {% set author = post.getAuthor() %}
+                            {% set dynastyId = dynasty(author) %}
+                            {% if dynastyId %}
+                                {% set dynasty = taxonomy(dynastyId) %}
+                                {% if dynasty %}
+                                    <span class="dynasty text-sm leading-8 text-slate-400">&nbsp;-&nbsp;【{{ dynasty.name }}】&nbsp;·&nbsp;</span>
+                                {% endif %}
+                            {% endif %}
+                            <a class="text-sm hover:underline text-slate-700 dark:text-slate-300" href="{{ permalink(author) }}">{{ author.getNickname() }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+
             <div class="flex flex-col mb-8 bg-white dark:bg-slate-800 rounded-md p-6">
                 <div class="font-bold mb-6">
                     <h4 class="pb-2 text-lg text-slate-700 dark:text-slate-300 tracking-widest border-b-2 border-indigo-500">你想知道得？</h4>
