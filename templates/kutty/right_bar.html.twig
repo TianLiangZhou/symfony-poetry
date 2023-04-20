@@ -33,7 +33,7 @@
         </div>
         {% endif %}
 
-        {% set authorEntities = widget('high_author_posts', {author: entity.id}) %}
+        {% set authorEntities = widget('high_author_posts', {author: entity.id, type: ['post', 'book', 'article']}) %}
         {% if authorEntities %}
             <div class="bg-white  dark:bg-slate-800 rounded-md mt-8">
                 <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
@@ -67,7 +67,7 @@
             </div>
             <div>
                 <ul>
-                    {% set taxonomyEntities = widget('high_taxonomy_posts', {taxonomy: entity}) %}
+                    {% set taxonomyEntities = widget('high_taxonomy_posts', {taxonomy: entity,  type: ['post', 'book', 'article']}) %}
                     {% for item in taxonomyEntities %}
                         <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
                             <span class="block rounded-full  w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">{% if loop.index < 4 %}{{ loop.index }}{% endif %}</span>
@@ -86,7 +86,8 @@
             </div>
             <div>
                 <ul>
-                    {% set entities = widget('high_posts') %}
+                    {% set entities = widget('high_posts',
+                        {type: ['post', 'book', 'article']}) %}
                     {% for item in entities %}
                         <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
                             <span class="block rounded-full w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">{% if loop.index < 4 %}{{ loop.index }}{% endif %}</span>
