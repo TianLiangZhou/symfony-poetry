@@ -17,6 +17,7 @@ use OctopusPress\Plugin\StatisticalAnalysis\Provider\StatisticalProvider;
 use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighAuthor;
 use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighAuthorPosts;
 use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighPosts;
+use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighTaxonomies;
 use OctopusPress\Plugin\StatisticalAnalysis\Widget\HighTaxonomyPosts;
 
 class StatisticalAnalysis implements PluginInterface
@@ -46,7 +47,9 @@ class StatisticalAnalysis implements PluginInterface
                 ->registerForClassName(HighPosts::class)
                 ->registerForClassName(HighAuthor::class)
                 ->registerForClassName(HighAuthorPosts::class)
-                ->registerForClassName(HighTaxonomyPosts::class);
+                ->registerForClassName(HighTaxonomyPosts::class)
+                ->registerForClassName(HighTaxonomies::class)
+            ;
         });
         $bridger->getHook()->add('plugin_action_links', function (array $actions, string $name) {
             return $actions;

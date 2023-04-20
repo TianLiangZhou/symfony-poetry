@@ -120,4 +120,20 @@
             </ul>
         </div>
     </div>
+    <div class="bg-white dark:bg-slate-800 rounded-md mt-8">
+        <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
+            <h3 class="text-lg font-medium leading-6 text-slate-700 dark:text-slate-300">热门标签</h3>
+        </div>
+        {% set colors = {'indigo':'bg-indigo-500', 'rose':'bg-rose-500', 'pink':'bg-pink-500', 'fuchsia':'bg-fuchsia-500', 'purple':'bg-purple-500', 'violet':'bg-violet-500', 'blue':'bg-blue-500', 'green':'bg-green-500', 'cyan':'bg-cyan-500', 'teal':'bg-teal-500', 'emerald':'bg-emerald-500', 'lime':'bg-lime-500', 'yellow':'bg-yellow-500', 'amber':'bg-amber-500', 'orange':'bg-orange-500', 'red':'bg-red-500'}  %}
+        {% set colorNames = colors|keys %}
+        {% set length = colorNames|length %}
+        <div class="flex px-4 flex-row flex-wrap mx-[-0.5rem] my-[-0.35rem]">
+            {% for item in widget('high_taxonomies', {limit: 52}) %}
+                {% set name = colorNames[loop.index % length] %}
+                <a class="rounded-full {{ colors[name] }} mx-2 my-1.5 block px-2.5 py-1 text-slate-200" href="{{ permalink(item) }}">
+                    {{ item.getName() }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
 </div>
