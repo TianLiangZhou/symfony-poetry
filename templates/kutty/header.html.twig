@@ -32,7 +32,7 @@
                     </nav>
                     <div x-data="Components.theme({ open: false, focus: false })" x-init="init()" @keydown.escape="onEscape" @close-popover-group.window="onClosePopoverGroup"
                          class="relative flex items-center border-l border-slate-200 ml-6 pl-6 dark:border-slate-900">
-                        <button type="button" aria-expanded="false" @click="toggle" @mousedown="if (open) $event.preventDefault()" :aria-expanded="open.toString()">
+                        <button aria-label="Switch Theme" type="button" aria-expanded="false" @click="toggle" @mousedown="if (open) $event.preventDefault()" :aria-expanded="open.toString()">
                             <span>
                                 <svg :class="{'hidden': $store.theme.system=='Dark'}" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                      class="w-6 h-6 mr-2">
