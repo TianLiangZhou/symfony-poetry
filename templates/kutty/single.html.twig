@@ -121,7 +121,7 @@
                 </div>
 
 
-                {% set authorEntities = widget('high_author_posts', {author: author.id}) %}
+                {% set authorEntities = widget('high_author_posts', {author: author.id, type: ['post', 'book', 'article']}) %}
                 <div class="bg-white  dark:bg-slate-800 rounded-md mt-16">
                     <div class="border-b border-slate-200 dark:border-slate-900 px-4 py-5">
                         <div class="flex justify-between items-center">
@@ -152,7 +152,7 @@
                     </div>
                     <div>
                         <ul>
-                            {% set entities = widget('high_posts') %}
+                            {% set entities = widget('high_posts', {type: ['post', 'book', 'article']}) %}
                             {% for item in entities %}
                                 <li class="truncate px-4 py-2 border-b border-slate-200 dark:border-slate-900 last:border-0 flex items-center">
                                     <span class="block rounded-full w-5 h-5 text-white text-center {% if loop.index == 1 %} bg-yellow-500 {% elseif loop.index == 2 %} bg-stone-300 {% elseif loop.index == 3 %} bg-amber-900 {% endif %}">{% if loop.index < 4 %}{{ loop.index }}{% endif %}</span>
