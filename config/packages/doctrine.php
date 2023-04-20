@@ -27,13 +27,18 @@ return static function (DoctrineConfig $doctrine, ContainerConfigurator $configu
         ->prefix('App\Entity')
         ->alias('App');
     if ($configurator->env() === 'prod') {
-        $doctrine->orm()->entityManager('default')->metadataCacheDriver()
+        $doctrine->orm()
+            ->entityManager('default')
+            ->metadataCacheDriver()
             ->type('pool')
             ->pool('doctrine.system_cache_pool');
-        $doctrine->orm()->entityManager('default')->queryCacheDriver()
+        $doctrine->orm()
+            ->entityManager('default')
+            ->queryCacheDriver()
             ->type('pool')
             ->pool('doctrine.system_cache_pool');
-        $doctrine->orm()->entityManager('default')->resultCacheDriver()
+        $doctrine->orm()->entityManager('default')
+            ->resultCacheDriver()
             ->type('pool')
             ->pool('doctrine.result_cache_pool');
     }
