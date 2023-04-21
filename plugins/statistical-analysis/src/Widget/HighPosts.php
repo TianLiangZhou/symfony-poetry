@@ -41,10 +41,7 @@ class HighPosts extends AbstractWidget implements \IteratorAggregate
             ];
         }
         $orderByMap = array_flip($result);
-        $posts = $this->getBridger()->getPostRepository()
-            ->findBy([
-                'id' => $result,
-            ]);
+        $posts = $this->getBridger()->getPostRepository()->createQuery(['id' => $result])->getResult();
         $overOrder = [];
         foreach ($posts as $item) {
             $overOrder[$orderByMap[$item->getId()]] = $item;

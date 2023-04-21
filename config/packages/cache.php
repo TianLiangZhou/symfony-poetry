@@ -1,13 +1,14 @@
 <?php
 
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Config\FrameworkConfig;
 
 return static function (FrameworkConfig $framework) {
     $cache = $framework->cache();
     if (($_ENV['CACHE_DRIVER'] ?? '') === 'redis') {
-        $cache->app('cache.adapter.redis')
-            ->defaultRedisProvider('app.redis.provider')
+        $cache->app('app.cache.adapter.redis')
+            ->defaultRedisProvider('app.cache.redis.provider')
             ->system('cache.adapter.apcu');
     } else {
         $cache->app('cache.adapter.filesystem')
@@ -20,4 +21,5 @@ return static function (FrameworkConfig $framework) {
         ->adapters('cache.system');
     $cache->pool('doctrine.result_cache_pool')
         ->adapters('cache.app');
+
 };

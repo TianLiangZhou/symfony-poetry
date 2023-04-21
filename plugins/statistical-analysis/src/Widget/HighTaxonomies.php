@@ -39,9 +39,7 @@ class HighTaxonomies extends AbstractWidget implements \IteratorAggregate
         }
         $orderByMap = array_flip($result);
         $taxonomies = $this->getBridger()->getTaxonomyRepository()
-            ->findBy([
-                'id' => $result,
-            ]);
+            ->taxonomies($taxonomy, ['id' => $result]);
         $overOrder = [];
         foreach ($taxonomies as $item) {
             $overOrder[$orderByMap[$item->getId()]] = $item;
