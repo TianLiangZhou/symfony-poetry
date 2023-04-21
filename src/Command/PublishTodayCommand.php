@@ -30,7 +30,7 @@ class PublishTodayCommand extends Command
     {
         $connection = $this->bridger->getEntityManager()->getConnection();
         $associative = $connection->executeQuery(
-            'SELECT id, author, type, status FROM posts WHERE status = ? ORDER BY RAND() LIMIT 2',
+            'SELECT id, author, type, status FROM posts WHERE status = ? ORDER BY RAND() LIMIT 8',
             ['draft'],
             [ParameterType::STRING]
         )->fetchAllAssociative();
