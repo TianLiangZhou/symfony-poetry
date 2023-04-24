@@ -59,12 +59,28 @@ class OctopusSeo implements PluginInterface
     {
         $bridger = $event->getBridger();
         $activatedRoute = $bridger->getActivatedRoute();
+        $search = ['%name%', '%slogan%', '%description%', '%title%', '%category%', '%excerpt%', '%desc%', '%level%', '%intro%', '%parent%', '%separator%'];
 
-        $sep = $this->config['separator'] ?? '-';
         $createdAt = $modifiedAt = $author = "";
         $tags = $attachment = [];
         $ogType = 'article';
-        $title = $desc = $excerpt = $intro = $category = $level = $parent = '';
+
+        $rep = $bridger->getOptionRepository();
+        $lang = $rep->lang();
+        $currentUrl = $bridger->getRequest()->getUriForPath($bridger->getRequest()->server->get('ORIGIN_REQUEST_URI'));
+        $variables = [
+            'name' => $rep->title(),
+            'slogan' => $rep->subtitle(),
+            'description' => $rep->description(),
+            'title'    => '',
+            'category' => '',
+            'excerpt'  => '',
+            'desc'     => '',
+            'level'    => '',
+            'intro'    => '',
+            'parent'   => '',
+            'separator' => $this->config['separator'] ?? '-',
+        ];
         /**
          * @var $entity ArchiveDataSet|Post
          */
@@ -76,70 +92,57 @@ class OctopusSeo implements PluginInterface
             }
             $createdAt = $entity->getCreatedAt()->format(DateTimeInterface::ATOM);
             $modifiedAt = $entity->getModifiedAt()->format(DateTimeInterface::ATOM);
-            $title = $entity->getTitle();
-            $excerpt = $entity->getExcerpt();
-            if (mb_strlen($excerpt) > 155) {
-                $excerpt = mb_substr($excerpt, 0, 155);
+            $variables['title'] = $entity->getTitle();
+            $variables['excerpt'] = $entity->getExcerpt();
+            if (mb_strlen($variables['excerpt']) > 155) {
+                $variables['excerpt'] = mb_substr($variables['excerpt'], 0, 155);
             }
             $arrayCollection = $entity->getCategories();
             if ($arrayCollection->count() > 0) {
-                $category = $arrayCollection->get(0)->getName();
+                $variables['category'] = $arrayCollection->get(0)->getName();
             }
             if ($entity->getParent() != null) {
                 $parent = $entity->getParent()->getTitle();
-                if (empty($excerpt)) {
-                    $excerpt = $entity->getParent()->getExcerpt();
+                if (empty($variables['excerpt'])) {
+                    $variables['excerpt'] = $entity->getParent()->getExcerpt();
                 }
             }
             $option = $this->config['type_' . $entity->getType()];
         } elseif ($activatedRoute->isArchives()) {
             $classify = $entity->getArchiveTaxonomy();
             if ($classify instanceof TermTaxonomy) {
-                $title = $classify->getName();
+                $variables['title'] = $classify->getName();
                 $option = $this->config['taxonomy_' . $classify->getTaxonomy()];
-                $desc = $classify->getDescription();
-                if (mb_strlen($desc) > 155) {
-                    $desc = mb_substr($desc, 0, 154);
+                $variables['desc'] = $classify->getDescription();
+                if (mb_strlen($variables['desc']) > 155) {
+                    $variables['desc'] = mb_substr($variables['desc'], 0, 154);
                 }
             } elseif ($classify instanceof User) {
                 $ogType = 'profile';
-                $title = $author = $classify->getNickname();
-                $intro = $classify->getMeta('description')?->getMetaValue();
-                if (mb_strlen($intro) > 155) {
-                    $intro = mb_substr($intro, 0, 154);
+                $variables['desc'] = $author = $classify->getNickname();
+                $variables['intro'] = $classify->getMeta('description')?->getMetaValue();
+                if (mb_strlen($variables['intro']) > 155) {
+                    $variables['intro'] = mb_substr($variables['intro'], 0, 154);
                 }
                 $option = $this->config['author'];
             } else {
                 $option = $this->config['home'];
             }
-        } else {
+        } elseif ($activatedRoute->isHome()) {
             $option = $this->config['home'];
             $ogType = 'website';
+        } else {
+            $option = $this->config['type_page'];
+            $ogType = 'website';
+            $routeName = $activatedRoute->getRouteName();
+            $routeCustom = $bridger->getHook()->filter('_seo_' . $routeName, [
+                'options'  => $option,
+                'variables'=> [],
+            ]);
+            $option = $routeCustom['options'] ?? $option;
+            $variables = array_merge($variables, $routeCustom['variables'] ?? []);
         }
-        $rep = $bridger->getOptionRepository();
-        $siteTitle = $rep->title();
-        $siteSubtitle = $rep->subtitle();
-        $siteDescription = $rep->description();
-        $lang = $rep->lang();
-        $currentUrl = $bridger->getRequest()->getUriForPath(
-            $bridger->getRequest()->server->get('ORIGIN_REQUEST_URI')
-        );
-        $search = [
-            '%name%',
-            '%slogan%',
-            '%description%',
-            '%title%',
-            '%category%',
-            '%excerpt%',
-            '%desc%',
-            '%level%',
-            '%intro%',
-            '%parent%',
-            '%separator%'
-        ];
-        $replace = [
-            $siteTitle, $siteSubtitle, $siteDescription, $title, $category, $excerpt, $desc, $level, $intro, $parent, $sep,
-        ];
+        $replace = array_values($variables);
         $title = str_replace($search, $replace, $option['title']);
         $description = str_replace($search, $replace, $option['description']);
         $socialTitle = str_replace($search, $replace, $option['social_title']);
@@ -154,7 +157,7 @@ class OctopusSeo implements PluginInterface
         echo "\t\t", '<meta property="og:title" content="' . $socialTitle . '" />', PHP_EOL;
         echo "\t\t", '<meta property="og:description" content="' . $socialDescription . '" />', PHP_EOL;
         echo "\t\t", '<meta property="og:url" content="' . $currentUrl . '" />', PHP_EOL;
-        echo "\t\t", '<meta property="og:site_name" content="' . $siteTitle . '" />', PHP_EOL;
+        echo "\t\t", '<meta property="og:site_name" content="' . $variables['name'] . '" />', PHP_EOL;
         if ($author && $ogType === 'article') {
             echo "\t\t", '<meta property="og:author" content="' . $author . '" />', PHP_EOL;
         }

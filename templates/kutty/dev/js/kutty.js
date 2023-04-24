@@ -107,7 +107,7 @@ import "alpinejs/dist/cdn.min"
         } else {
           this.system = theme;
         }
-        cookie.setItem('_theme', theme);
+        cookie.setItem('_theme', theme, null, '/');
       }
     });
   });
