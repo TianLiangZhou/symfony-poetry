@@ -42,7 +42,7 @@
         "symfony/yaml": "6.2.*",
         "twig/extra-bundle": "^3.0",
         "twig/twig": "^3.0",
-        "meshell/octopuspress-bundle": "@dev"
+        "meshell/octopuspress-bundle": "dev-main"
     },
     "config": {
         "allow-plugins": {
