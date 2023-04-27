@@ -119,7 +119,7 @@ class OctopusSeo implements PluginInterface
                 }
             } elseif ($classify instanceof User) {
                 $ogType = 'profile';
-                $variables['desc'] = $author = $classify->getNickname();
+                $variables['title'] = $author = $classify->getNickname();
                 $variables['intro'] = $classify->getMeta('description')?->getMetaValue();
                 if (mb_strlen($variables['intro']) > 155) {
                     $variables['intro'] = mb_substr($variables['intro'], 0, 154);

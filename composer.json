@@ -108,7 +108,7 @@
             "type": "path",
             "url": "../octopuspress-bundle",
             "options": {
-              "symlink": false
+              "symlink": true
             }
         }
     ]
