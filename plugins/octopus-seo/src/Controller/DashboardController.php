@@ -55,6 +55,22 @@ class DashboardController extends AdminController
         return $this->json($draw);
     }
 
+    #[Route("/octopus_seo/advanced", name: 'octopus_seo_advanced', options: ['name' => '高级', 'icon' => 'options-2-outline', 'sort' => 3, 'parent'=>'octopus_seo', 'link' => '/app/plugin/feature'], methods: Request::METHOD_GET)]
+    public function advanced(): JsonResponse
+    {
+        $maps = $this->getValue($this->getOption());
+        $draw = Draw::builder();
+        $draw->title('章鱼 SEO - 高级');
+        $tabs = $draw->tabs();
+
+        $author = new Form();
+        $author->setDirection('row');
+        $author->addControl($this->buildGroup('author', 'author', $maps['author'] ?? []));
+        $author->setSubmit('/octopus_seo/save');
+        $tabs->addTab('作者', $author);
+        return $this->json($draw);
+    }
+
 
 
     #[Route("/octopus_seo/save", name: 'octopus_seo_save', options: ['name' => '保存配置', 'parent' => 'octopus_seo'], methods: Request::METHOD_POST)]
@@ -323,6 +339,9 @@ class DashboardController extends AdminController
             $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%title%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">述语标题</button>';
             $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%level%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">述语层次结构</button>';
             $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%desc%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">描述</button>';
+        } elseif (str_starts_with($parent, 'author')) {
+            $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%title%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">作者名称</button>';
+            $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%intro%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">作者简介</button>';
         } else {
             $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%slogan%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">网站副标题</button>';
             $buttons .= '<button type="button" nbbutton data-parent="'.$parent.'" data-control="'.$controlId.'" data-value="%description%" class="seo-variable mx-2 appearance-filled size-tiny shape-rectangle status-control nb-transition">标语</button>';
