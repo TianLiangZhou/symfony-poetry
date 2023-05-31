@@ -26,3 +26,5 @@
 ###< symfony/phpunit-bridge ###
 
 .idea
+/plugins
+/templates
