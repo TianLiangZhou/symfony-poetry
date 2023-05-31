@@ -2,12 +2,10 @@
 
 namespace App;
 
-use App\Widget\Question;
 use OctopusPress\Bundle\Bridge\Bridger;
 use OctopusPress\Bundle\Customize\AbstractControl;
 use OctopusPress\Bundle\Customize\Control;
 use OctopusPress\Bundle\OctopusPressKernel;
-use OctopusPress\Bundle\Plugin\Manifest;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
 
@@ -72,11 +70,6 @@ class Kernel extends OctopusPressKernel implements PluginInterface
                 'options' => $options,
             ]))
             ;
-    }
-
-    public static function manifest(): Manifest
-    {
-        return Manifest::builder();
     }
 
     public function activate(Bridger $bridger): void
