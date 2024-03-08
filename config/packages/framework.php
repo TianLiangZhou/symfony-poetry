@@ -23,7 +23,7 @@ return static function (FrameworkConfig $frameworkConfig, ContainerBuilder $cont
     }
 
     $frameworkConfig->phpErrors()
-        ->log();
+        ->log(true);
     $frameworkConfig->csrfProtection()
         ->enabled(false);
     $env = $container->getParameter('kernel.environment');
