@@ -5,6 +5,8 @@ namespace App;
 use OctopusPress\Bundle\Bridge\Bridger;
 use OctopusPress\Bundle\Customize\AbstractControl;
 use OctopusPress\Bundle\Customize\Control;
+use OctopusPress\Bundle\Entity\Post;
+use OctopusPress\Bundle\Event\FilterEvent;
 use OctopusPress\Bundle\OctopusPressKernel;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
@@ -51,6 +53,11 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ;
 
 
+        $bridger
+            ->getHook()->add('_seo_graph_title', $this->tempHandleTitle(...))
+            ->add('_seo_title', $this->tempHandleTitle(...));
+
+
         $taxonomies = $bridger->getTaxonomyRepository()->taxonomies('dynasty');
         $options = [];
         foreach ($taxonomies as $taxonomy) {
@@ -70,6 +77,29 @@ class Kernel extends OctopusPressKernel implements PluginInterface
                 'options' => $options,
             ]))
             ;
+    }
+
+    /**
+     * @param string $title
+     * @param object $presentation
+     * @param FilterEvent $event
+     * @return string
+     */
+    public function tempHandleTitle(string $title, object $presentation, FilterEvent $event): string
+    {
+        if (stripos($title, '%parent%') !== false) {
+            if ($event->getBridger()->getActivatedRoute()->isSingular()) {
+                /**
+                 * @var $controllerResult Post
+                 */
+                $controllerResult = $event->getBridger()->getControllerResult();
+                $parent = $controllerResult->getParent();
+                if ($parent != null) {
+                    return str_replace('%parent%', $parent->getTitle(), $title);
+                }
+            }
+        }
+        return $title;
     }
 
     public function activate(Bridger $bridger): void
