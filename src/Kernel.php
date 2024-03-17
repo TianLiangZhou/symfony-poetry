@@ -10,6 +10,8 @@ use OctopusPress\Bundle\Event\FilterEvent;
 use OctopusPress\Bundle\OctopusPressKernel;
 use OctopusPress\Bundle\Plugin\PluginInterface;
 use OctopusPress\Bundle\Plugin\PluginProviderInterface;
+use OctopusPress\Bundle\Twig\OctopusRuntime;
+use OctopusPress\Plugin\OctopusSeo\OctopusSeo;
 
 class Kernel extends OctopusPressKernel implements PluginInterface
 {
@@ -52,11 +54,77 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ->addTaxonomyMenu('dynasty', '朝代', ['parent' => 'backend_post', 'sort' => 5])
             ;
 
-
         $bridger
             ->getHook()->add('_seo_graph_title', $this->tempHandleTitle(...))
-            ->add('_seo_title', $this->tempHandleTitle(...));
+            ->add('_seo_title', $this->tempHandleTitle(...))
+            ->add('_seo_schema_supports_qa', function (bool $supports) use ($bridger) {
+                if ($bridger->getActivatedRoute()->isSingular()) {
+                    /**
+                     * @var $controllerResult Post
+                     */
+                    $controllerResult = $bridger->getControllerResult();
+                    return $controllerResult->getType() === 'question';
+                }
+                return false;
+            })
+            ->add('_seo_schema_qa', function (array $data) use ($bridger) {
+                $data['@id'] = $bridger->getRequest()->getUri() . '/#question';
+                /**
+                 * @var $controllerResult Post
+                 */
+                $controllerResult = $bridger->getControllerResult();
+                $data['name'] = $controllerResult->getTitle();
 
+                $tags = [];
+                foreach ($controllerResult->getTags() as $tag) {
+                    $tags[] = $tag->getId();
+                }
+                $runtime = $bridger->getTwig()->getRuntime(OctopusRuntime::class);
+                $taxonomyPosts = $runtime->getTaxonomyPosts($tags, ['type' => 'post', 'article', 'book']);
+                $data["answerCount"] = count($taxonomyPosts);
+                $data["datePublished"] = $controllerResult->getCreatedAt()->format(DATE_ATOM);
+                $siteUrl = $bridger->getRequest()->getSchemeAndHttpHost();
+                $data["author"] = [
+                    '@type' => 'Organization',
+                    'name'  => OctopusSeo::getOption('organization')['name'] ?? '',
+                    'url'   => $siteUrl,
+                ];
+                $answers = [];
+                foreach ($taxonomyPosts as $post) {
+                    /**
+                     * @var  $post Post
+                     */
+                    $answers[] = [
+                        "@type" => "Answer",
+                        "text" => $post->getTitle(),
+                        "url" => $siteUrl . $runtime->permalink($post),
+                        "datePublished" => $post->getCreatedAt()->format(DATE_ATOM),
+                        "author" => [
+                            "@type" => "Person",
+                            "name" => $post->getAuthor()->getNickname(),
+                            "url" => $siteUrl . $runtime->permalink($post->getAuthor())
+                        ],
+                    ];
+                }
+                $data['suggestedAnswer'] = $answers;
+                unset($data['acceptedAnswer'],$data['upvoteCount'], $data['text']);
+                return $data;
+            })
+            ->add('_seo_schema_webpage', function (array $data) use ($bridger) {
+
+                /**
+                 * @var $controllerResult Post
+                 */
+                $controllerResult = $bridger->getControllerResult();
+                if ($controllerResult instanceof Post && $controllerResult->getType() === 'question') {
+                    $data['mainEntity'] = [
+                        "@type" => 'Question',
+                        "@id" => $bridger->getRequest()->getUri() . '/#question',
+                    ];
+                }
+                return $data;
+            })
+        ;
 
         $taxonomies = $bridger->getTaxonomyRepository()->taxonomies('dynasty');
         $options = [];
