@@ -36,7 +36,7 @@ class Kernel extends OctopusPressKernel implements PluginInterface
             ])
             ->registerType('chapter', [
                 'label' => '章节',
-                'supports' => ['title', 'parent', 'excerpt', 'editor'],
+                'supports' => ['title', 'parent', 'excerpt', 'editor', 'author'],
                 'taxonomies' => ['category', 'tag',],
                 'parentType' => ['book', 'chapter'],
             ])
