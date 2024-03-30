@@ -1,3 +1,3 @@
 # See
 
-[www.gujinread.com](https://www.gujinread.ccom)
+[www.gujinread.com](https://www.gujinread.com)
