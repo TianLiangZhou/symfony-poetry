@@ -41,7 +41,8 @@
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^3.0",
         "twig/twig": "^3.0",
-        "meshell/octopuspress-bundle": "dev-main"
+        "meshell/octopuspress-bundle": "dev-main",
+        "meshell/php-ffi-packages": "*"
     },
     "config": {
         "allow-plugins": {
