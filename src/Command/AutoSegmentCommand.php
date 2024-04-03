@@ -3,8 +3,12 @@
 namespace App\Command;
 
 use FastFFI\LAC\LAC;
+use FastFFI\Pinyin\Pinyin;
 use OctopusPress\Bundle\Bridge\Bridger;
 use OctopusPress\Bundle\Entity\Post;
+use OctopusPress\Bundle\Entity\Term;
+use OctopusPress\Bundle\Entity\TermRelationship;
+use OctopusPress\Bundle\Entity\TermTaxonomy;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,23 +40,99 @@ class AutoSegmentCommand extends Command
             ->getSingleScalarResult();
 
 
-        $pageSize = ceil($count / 5000);
+
+        $pageSize = ceil($count / 1000);
         $lac = LAC::new();
+        $pinyin = Pinyin::new();
         for($i = 0; $i < $pageSize; $i++) {
             $query = $entityManager->createQuery('SELECT p FROM ' . Post::class . ' p WHERE p.type IN (?1) ORDER BY p.id ASC');
             $query->setParameter(1, $showFrontTypes)
-                ->setFirstResult($i * 5000)
-                ->setMaxResults(5000);
+                ->setFirstResult($i * 1000)
+                ->setMaxResults(1000);
             foreach ($query->toIterable() as $item) {
                 /**
                  * @var $item Post
                  */
 
-                $title = $item->getTitle();
-                $lac->parse($title);
-                echo $title, "\n";
+                $title = explode('·', $item->getTitle())[0];
+                $segments = $lac->parse($title);
+                $words = explode(' ', $segments['words']);
+                $tags  = explode(' ', $segments['tags']);
+                $filterWords = [];
+                foreach ($words as $i => $word) {
+                    if (mb_strlen($word) < 2) {
+                        continue;
+                    }
+                    if (!isset($tags[$i])) {
+                        continue;
+                    }
+                    if (in_array($tags[$i], ['r', 'nw', 'm', 'q', 'r', 'd', 'p', 'w', 'xc', 'u','c'])) {
+                        continue;
+                    }
+                    if (in_array($word, $filterWords)) {
+                        continue;
+                    }
+                    if ($word == $title) {
+                        continue;
+                    }
+                    echo $word ,"=", $tags[$i], " ";
+                    $filterWords[] = $word;
+                }
+                if (empty($filterWords)) {
+                    continue;
+                }
+                echo $item->getId(), "=", $title, "\n";
+
+                $taxonomies = [];
+                foreach ($filterWords as $word) {
+                    $slug = $pinyin->slug($word);
+                    $term = $entityManager->createQuery('SELECT t FROM ' . Term::class . ' t WHERE t.name = ?1 AND t.slug = ?2')
+                        ->setParameter(1, $word)
+                        ->setParameter(2, $slug)
+                        ->setMaxResults(1)
+                        ->getOneOrNullResult();
+                    if ($term == null) {
+                        $term = new Term();
+                        $term->setName($word)->setSlug($slug);
+                        $taxonomy = new TermTaxonomy();
+                        $taxonomy->setTaxonomy(TermTaxonomy::TAG)
+                            ->setTerm($term)
+                            ->setCount(1);
+                    } else {
+                        $taxonomy = $entityManager->createQuery('SELECT tt FROM ' . TermTaxonomy::class . ' tt WHERE tt.term = ?1 AND tt.taxonomy = ?2')
+                            ->setParameter(1, $term->getId())
+                            ->setParameter(2, TermTaxonomy::TAG)
+                            ->setMaxResults(1)
+                            ->getOneOrNullResult();
+                        if ($taxonomy == null) {
+                            $taxonomy = new TermTaxonomy();
+                            $taxonomy->setTaxonomy(TermTaxonomy::TAG);
+                            $taxonomy->setTerm($term);
+                        }
+                        $taxonomy->setCount($taxonomy->getCount() + 1);
+                    }
+                    $taxonomies[] = $taxonomy;
+                    $entityManager->persist($taxonomy);
+                }
+                $entityManager->flush();
+                $taxonomySets = [];
+                foreach ($item->getTermRelationships() as $relationship) {
+                    $taxonomySets[] = $relationship->getTaxonomy()->getId();
+                }
+                foreach ($taxonomies as $taxonomy) {
+                    if (in_array($taxonomy->getId(), $taxonomySets)) {
+                        $taxonomy->setCount($taxonomy->getCount() - 1);
+                        $entityManager->persist($taxonomy);
+                        continue;
+                    }
+                    $termRelationship = new TermRelationship();
+                    $termRelationship->setTaxonomy($taxonomy);
+                    $item->addTermRelationship($termRelationship);
+                }
+                $entityManager->persist($item);
+                $entityManager->flush();
             }
-            die;
+            $entityManager->clear();
         }
 
 
