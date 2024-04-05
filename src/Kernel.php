@@ -26,7 +26,7 @@ class Kernel extends OctopusPressKernel implements PluginInterface
         $bridger->getPost()
             ->registerType('question', [
                 'label' => '问答',
-                'supports' => ['title'],
+                'supports' => ['title', 'excerpt', 'editor', 'thumbnail'],
                 'taxonomies' => ['tag'],
             ])
             ->registerType('book', [
