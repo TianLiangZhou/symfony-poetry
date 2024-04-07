@@ -40,15 +40,16 @@ class AutoSegmentCommand extends Command
             ->getSingleScalarResult();
 
 
-
-        $pageSize = ceil($count / 1000);
+        $max = 1000;
+        $pageSize = ceil($count / $max);
         $lac = LAC::new();
         $pinyin = Pinyin::new();
         for($i = 0; $i < $pageSize; $i++) {
+            echo "pageSize =", $i + 1, "\n";
             $query = $entityManager->createQuery('SELECT p FROM ' . Post::class . ' p WHERE p.type IN (?1) ORDER BY p.id ASC');
             $query->setParameter(1, $showFrontTypes)
-                ->setFirstResult($i * 1000)
-                ->setMaxResults(1000);
+                ->setFirstResult($i * $max)
+                ->setMaxResults($max);
             foreach ($query->toIterable() as $item) {
                 /**
                  * @var $item Post
