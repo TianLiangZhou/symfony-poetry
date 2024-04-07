@@ -50,7 +50,8 @@ class AutoSegmentCommand extends Command
             $query->setParameter(1, $showFrontTypes)
                 ->setFirstResult($i * $max)
                 ->setMaxResults($max);
-            foreach ($query->toIterable() as $item) {
+            $toIterable = $query->toIterable();
+            foreach ($toIterable as $item) {
                 /**
                  * @var $item Post
                  */
@@ -60,14 +61,14 @@ class AutoSegmentCommand extends Command
                 $words = explode(' ', $segments['words']);
                 $tags  = explode(' ', $segments['tags']);
                 $filterWords = [];
-                foreach ($words as $i => $word) {
+                foreach ($words as $j => $word) {
                     if (mb_strlen($word) < 2) {
                         continue;
                     }
-                    if (!isset($tags[$i])) {
+                    if (!isset($tags[$j])) {
                         continue;
                     }
-                    if (in_array($tags[$i], ['r', 'nw', 'm', 'q', 'r', 'd', 'p', 'w', 'xc', 'u','c'])) {
+                    if (in_array($tags[$j], ['r', 'nw', 'm', 'q', 'r', 'd', 'p', 'w', 'xc', 'u','c'])) {
                         continue;
                     }
                     if (in_array($word, $filterWords)) {
@@ -76,7 +77,7 @@ class AutoSegmentCommand extends Command
                     if ($word == $title) {
                         continue;
                     }
-                    echo $word ,"=", $tags[$i], " ";
+                    echo $word ,"=", $tags[$j], " ";
                     $filterWords[] = $word;
                 }
                 if (empty($filterWords)) {
